@@ -9,7 +9,7 @@
     <artifactId>jenkins-report-rpms</artifactId>
     <version>0.1-SNAPSHOT</version>
     <packaging>hpi</packaging>
-    <name>Jenkins RPMS list report publisher plugin</name>
+    <name>Jenkins RPMs list report publisher plugin</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>

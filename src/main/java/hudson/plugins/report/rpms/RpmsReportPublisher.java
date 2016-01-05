@@ -32,15 +32,22 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+
+import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
+import static hudson.plugins.report.rpms.Constants.RPMS_LIST_FILES;
 
 public class RpmsReportPublisher extends Recorder {
 
@@ -63,7 +70,7 @@ public class RpmsReportPublisher extends Recorder {
         if (stdout != null) {
             String[] lines = stdout.trim().split("\n");
             List<String> list = Arrays.stream(lines).filter(s -> s != null && s.length() > 0).sorted().collect(Collectors.toList());
-            return new RpmsReport(stderrReader.getResult(), list.toArray(new String[list.size()]));
+            return new RpmsReport(stderrReader.getResult(), list);
         }
         return new RpmsReport(stderrReader.getResult(), null);
     }
@@ -71,7 +78,9 @@ public class RpmsReportPublisher extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         RpmsReport report = executeCommand();
-        RpmsReportAction action = new RpmsReportAction();
+        Files.write(new File(build.getRootDir(), RPMS_LIST_FILES).toPath(), report.getRpms(), Charset.forName("UTF-8"), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        Files.write(new File(build.getRootDir(), RPMS_COMMAND_STDERR).toPath(), report.getStderr().getBytes("UTF-8"), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        RpmsReportAction action = new RpmsReportAction(build);
         build.addAction(action);
         return true;
     }

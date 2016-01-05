@@ -23,24 +23,9 @@
  */
 package hudson.plugins.report.rpms;
 
-import java.util.List;
+final public class Constants {
 
-public class RpmsReport {
-
-    private final String stderr;
-    private final List<String> rpms;
-
-    public RpmsReport(String stderr, List<String> rpms) {
-        this.stderr = stderr;
-        this.rpms = rpms;
-    }
-
-    public List<? extends CharSequence> getRpms() {
-        return rpms;
-    }
-
-    public String getStderr() {
-        return stderr;
-    }
+    public static final String RPMS_LIST_FILES = "rpms-stdout.txt";
+    public static final String RPMS_COMMAND_STDERR = "rpms-stderr.txt";
 
 }

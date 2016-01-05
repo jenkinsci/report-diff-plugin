@@ -1,0 +1,26 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
+    <l:layout title="${it.run} ${it.displayName}">
+        <l:main-panel>
+            <h1><st:out value="${it.title}" /></h1>
+
+            <j:if test="${it.stderr != null}">
+                <h2>Command stderr output</h2>
+                <div style="font-family: monospace">
+                    ${it.stderr}
+                </div>
+            </j:if>
+            <j:if test="${it.rpms != null}">
+                <h2>RPMs:</h2>
+                <div style="font-family: monospace">
+                    <ul>
+                        <j:forEach var="rpm" items="${it.rpms}">
+                            <li>${rpm}</li>
+                        </j:forEach>
+                    </ul>
+                </div>
+            </j:if>
+
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

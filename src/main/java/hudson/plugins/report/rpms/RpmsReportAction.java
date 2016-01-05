@@ -23,20 +23,29 @@
  */
 package hudson.plugins.report.rpms;
 
+import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.kohsuke.stapler.StaplerProxy;
+
+import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
+import static hudson.plugins.report.rpms.Constants.RPMS_LIST_FILES;
 
 public class RpmsReportAction implements Action, StaplerProxy {
 
-    private final RpmsReport report;
+    private final AbstractBuild<?, ?> build;
 
-    public RpmsReportAction(RpmsReport report) {
-        this.report = report;
+    public RpmsReportAction(AbstractBuild<?, ?> build) {
+        this.build = build;
     }
 
     @Override
     public String getIconFileName() {
-        return null;
+        return "graph.png";
     }
 
     @Override
@@ -50,8 +59,20 @@ public class RpmsReportAction implements Action, StaplerProxy {
     }
 
     @Override
-    public Object getTarget() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RpmsReport getTarget() {
+        try {
+            String stderr = Files
+                    .lines(new File(build.getRootDir(), RPMS_COMMAND_STDERR).toPath(), Charset.forName("UTF-8"))
+                    .filter(s -> s != null && s.length() > 0)
+                    .findFirst()
+                    .orElse(null);
+            List<String> rpms = Files
+                    .lines(new File(build.getRootDir(), RPMS_LIST_FILES).toPath(), Charset.forName("UTF-8"))
+                    .collect(Collectors.toList());
+            return new RpmsReport(stderr, rpms);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
 }
