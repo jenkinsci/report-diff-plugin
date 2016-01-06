@@ -25,7 +25,9 @@ package hudson.plugins.report.rpms;
 
 final public class Constants {
 
-    public static final String RPMS_LIST_FILES = "rpms-stdout.txt";
+    public static final String RPMS_NEW = "rpms-new.txt";
+    public static final String RPMS_REMOVED = "rpms-removed.txt";
+    public static final String RPMS_ALL = "rpms-all.txt";
     public static final String RPMS_COMMAND_STDERR = "rpms-stderr.txt";
 
 }

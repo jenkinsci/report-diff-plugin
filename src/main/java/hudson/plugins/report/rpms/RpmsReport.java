@@ -28,19 +28,31 @@ import java.util.List;
 public class RpmsReport {
 
     private final String stderr;
-    private final List<String> rpms;
+    private final List<String> newRpms;
+    private final List<String> removedRpms;
+    private final List<String> allRpms;
 
-    public RpmsReport(String stderr, List<String> rpms) {
+    public RpmsReport(String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
         this.stderr = stderr;
-        this.rpms = rpms;
-    }
-
-    public List<? extends CharSequence> getRpms() {
-        return rpms;
+        this.newRpms = newRpms;
+        this.removedRpms = removedRpms;
+        this.allRpms = allRpms;
     }
 
     public String getStderr() {
         return stderr;
+    }
+
+    public List<String> getNewRpms() {
+        return newRpms;
+    }
+
+    public List<String> getRemovedRpms() {
+        return removedRpms;
+    }
+
+    public List<String> getAllRpms() {
+        return allRpms;
     }
 
 }

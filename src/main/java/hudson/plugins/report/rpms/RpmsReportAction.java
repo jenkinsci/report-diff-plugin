@@ -26,14 +26,16 @@ package hudson.plugins.report.rpms;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import java.io.File;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.kohsuke.stapler.StaplerProxy;
 
+import static hudson.plugins.report.rpms.Constants.RPMS_ALL;
 import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
-import static hudson.plugins.report.rpms.Constants.RPMS_LIST_FILES;
+import static hudson.plugins.report.rpms.Constants.RPMS_NEW;
+import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 
 public class RpmsReportAction implements Action, StaplerProxy {
 
@@ -60,19 +62,29 @@ public class RpmsReportAction implements Action, StaplerProxy {
 
     @Override
     public RpmsReport getTarget() {
-        try {
-            String stderr = Files
-                    .lines(new File(build.getRootDir(), RPMS_COMMAND_STDERR).toPath(), Charset.forName("UTF-8"))
-                    .filter(s -> s != null && s.length() > 0)
-                    .findFirst()
-                    .orElse(null);
-            List<String> rpms = Files
-                    .lines(new File(build.getRootDir(), RPMS_LIST_FILES).toPath(), Charset.forName("UTF-8"))
-                    .collect(Collectors.toList());
-            return new RpmsReport(stderr, rpms);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        List<String> newRpms = readFile(RPMS_NEW);
+        List<String> removedRpms = readFile(RPMS_REMOVED);
+        List<String> allRpms = readFile(RPMS_ALL);
+        List<String> stderrs = readFile(RPMS_COMMAND_STDERR);
+        return new RpmsReport(
+                stderrs == null ? null : stderrs.stream().findFirst().orElse(null),
+                newRpms,
+                removedRpms,
+                allRpms);
+    }
+
+    private List<String> readFile(String fileName) {
+        File file = new File(build.getRootDir(), fileName);
+        if (file.exists() && file.isFile() && file.canRead()) {
+            try {
+                return Files
+                        .lines(file.toPath(), StandardCharsets.UTF_8)
+                        .collect(Collectors.toList());
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
+        return null;
     }
 
 }

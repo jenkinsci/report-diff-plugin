@@ -36,18 +36,23 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import static hudson.plugins.report.rpms.Constants.RPMS_ALL;
 import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
-import static hudson.plugins.report.rpms.Constants.RPMS_LIST_FILES;
+import static hudson.plugins.report.rpms.Constants.RPMS_NEW;
+import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 
 public class RpmsReportPublisher extends Recorder {
 
@@ -58,28 +63,69 @@ public class RpmsReportPublisher extends Recorder {
         this.command = command;
     }
 
-    private RpmsReport executeCommand() throws IOException, InterruptedException {
+    private List<String> executeCommand() throws OperationFailedException {
         if (command == null || command.trim().isEmpty()) {
-            return new RpmsReport("No command specified", null);
+            throw new OperationFailedException("No command specified");
         }
-        Process process = new ProcessBuilder(command.trim().split(" ")).start();
-        OutputReader stdoutReader = new OutputReader(process.getInputStream()).start();
-        OutputReader stderrReader = new OutputReader(process.getErrorStream()).start();
-        process.waitFor(60, TimeUnit.SECONDS);
-        String stdout = stdoutReader.getResult();
-        if (stdout != null) {
-            String[] lines = stdout.trim().split("\n");
-            List<String> list = Arrays.stream(lines).filter(s -> s != null && s.length() > 0).sorted().collect(Collectors.toList());
-            return new RpmsReport(stderrReader.getResult(), list);
+        try {
+            Process process = new ProcessBuilder(command.trim().split(" ")).start();
+            OutputReader stdoutReader = new OutputReader(process.getInputStream()).start();
+            OutputReader stderrReader = new OutputReader(process.getErrorStream()).start();
+            if (!process.waitFor(60, TimeUnit.SECONDS)) {
+                throw new OperationFailedException("Command time out");
+            }
+            if (stderrReader.getResult() != null) {
+                throw new OperationFailedException(stderrReader.getResult());
+            }
+            String stdout = stdoutReader.getResult();
+            if (stdout == null) {
+                throw new OperationFailedException("Command produced no output");
+            }
+            List<String> list = StringSpliterator.splitString(stdout, "\n")
+                    .filter(s -> s != null && s.length() > 0)
+                    .sorted()
+                    .collect(Collectors.toList());
+            return list;
+        } catch (OperationFailedException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new OperationFailedException(ex.toString());
         }
-        return new RpmsReport(stderrReader.getResult(), null);
     }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        RpmsReport report = executeCommand();
-        Files.write(new File(build.getRootDir(), RPMS_LIST_FILES).toPath(), report.getRpms(), Charset.forName("UTF-8"), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-        Files.write(new File(build.getRootDir(), RPMS_COMMAND_STDERR).toPath(), report.getStderr().getBytes("UTF-8"), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        try {
+
+            List<String> rpms = executeCommand();
+            Files.write(new File(build.getRootDir(), RPMS_ALL).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+            AbstractBuild previousBuild = build.getPreviousBuild();
+            if (previousBuild != null) {
+                File prevRpmsFile = new File(previousBuild.getRootDir(), RPMS_ALL);
+                if (prevRpmsFile.exists() && prevRpmsFile.isFile() && prevRpmsFile.canRead()) {
+                    Set<String> prevRpms = new HashSet(Files.readAllLines(prevRpmsFile.toPath()));
+
+                    // rpms list is already saved to file, we can modify it now:
+                    Iterator<String> rpmsIterator = rpms.iterator();
+                    while (rpmsIterator.hasNext()) {
+                        String rpm = rpmsIterator.next();
+                        if (prevRpms.remove(rpm)) {
+                            rpmsIterator.remove();
+                        }
+                    }
+
+                    List<String> removedRpms = prevRpms.stream().sorted().collect(Collectors.toList());
+
+                    Files.write(new File(build.getRootDir(), RPMS_NEW).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                    Files.write(new File(build.getRootDir(), RPMS_REMOVED).toPath(), removedRpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+
+                }
+            }
+
+        } catch (OperationFailedException ex) {
+            Files.write(new File(build.getRootDir(), RPMS_COMMAND_STDERR).toPath(), Arrays.asList(ex.getMessage()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        }
         RpmsReportAction action = new RpmsReportAction(build);
         build.addAction(action);
         return true;
@@ -143,7 +189,9 @@ public class RpmsReportPublisher extends Recorder {
                 while ((read = in.read(buffer)) != -1) {
                     sb.append(buffer, 0, read);
                 }
-                result = sb.toString();
+                if (sb.length() > 0) {
+                    result = sb.toString();
+                }
             } catch (Exception ex) {
                 result = ex.toString();
             }
@@ -155,6 +203,14 @@ public class RpmsReportPublisher extends Recorder {
             t.setName("RPMs Report - Output Reader - '" + command + "'");
             t.start();
             return this;
+        }
+
+    }
+
+    private class OperationFailedException extends Exception {
+
+        public OperationFailedException(String message) {
+            super(message);
         }
 
     }

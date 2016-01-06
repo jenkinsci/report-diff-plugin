@@ -10,12 +10,38 @@
                     ${it.stderr}
                 </div>
             </j:if>
-            <j:if test="${it.rpms != null}">
-                <h2>RPMs:</h2>
+            <j:if test="${it.newRpms != null}">
+                <h2>Newly installed RPMs:</h2>
                 <div style="font-family: monospace">
                     <ul>
-                        <j:forEach var="rpm" items="${it.rpms}">
-                            <li>${rpm}</li>
+                        <j:forEach var="rpm" items="${it.newRpms}">
+                            <li>
+                                ${rpm}
+                            </li>
+                        </j:forEach>
+                    </ul>
+                </div>
+            </j:if>
+            <j:if test="${it.removedRpms != null}">
+                <h2>Removed RPMs:</h2>
+                <div style="font-family: monospace">
+                    <ul>
+                        <j:forEach var="rpm" items="${it.removedRpms}">
+                            <li>
+                                ${rpm}
+                            </li>
+                        </j:forEach>
+                    </ul>
+                </div>
+            </j:if>
+            <j:if test="${it.allRpms != null}">
+                <h2>All RPMs:</h2>
+                <div style="font-family: monospace">
+                    <ul>
+                        <j:forEach var="rpm" items="${it.allRpms}">
+                            <li>
+                                ${rpm}
+                            </li>
                         </j:forEach>
                     </ul>
                 </div>
