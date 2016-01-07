@@ -52,7 +52,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getIconFileName() {
-        return "graph.png";
+        return "clipboard.png";
     }
 
     @Override

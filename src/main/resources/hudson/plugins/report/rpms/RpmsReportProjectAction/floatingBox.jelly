@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-    <canvas id="rpmsChart" width="500" height="200"></canvas>
+    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='200'></canvas></div>
     <script src="${rootURL}/plugin/jenkins-report-rpms/Chart.js"></script>
     <j:set var="chartData" value="${action.chartData}" />
     <script type="text/javascript">
@@ -61,7 +61,11 @@
         };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart").getContext("2d");
-        var myNewChart = new Chart(ctx).Line(data, options);
+        var rpmsChart = new Chart(ctx).Line(data, options);
+        document.getElementById("rpmsChartContainer").onclick = function(evt){
+        var activePoints = rpmsChart.getPointsAtEvent(evt);
+        window.open(activePoints[0].label.replace("#", ""), "_blank");
+        };
         // ]]&gt;
     </script>
 </j:jelly>
