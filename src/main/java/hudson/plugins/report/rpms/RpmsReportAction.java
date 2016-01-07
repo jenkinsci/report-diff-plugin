@@ -57,7 +57,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return "Installed RPMs";
+        return "RPM Changes";
     }
 
     @Override

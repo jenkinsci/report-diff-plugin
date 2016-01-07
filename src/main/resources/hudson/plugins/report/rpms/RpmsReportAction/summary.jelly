@@ -1,0 +1,33 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <t:summary icon="clipboard.png">
+        <a href="${it.urlName}/">${it.displayName}</a>
+        <st:nbsp/>
+        <j:set var="rpms" value="${it.target}"/>
+        <j:choose>
+            <j:when test="${rpms.newRpms.size() != 0}">
+                <j:choose>
+                    <j:when test="${rpms.newRpms.size() == rpms.removedRpms.size()}">
+                        ${rpms.newRpms.size()} RPMs updated
+                    </j:when>
+                    <j:when test="${rpms.removedRpms.size() == 0}">
+                        ${rpms.newRpms.size()} RPMs installed
+                    </j:when>
+                    <j:otherwise>
+                        ${rpms.newRpms.size()} RPMs installed, ${rpms.removedRpms.size()} RPMs removed
+                    </j:otherwise>
+                </j:choose>
+            </j:when>
+            <j:otherwise>
+                <j:choose>
+                    <j:when test="${rpms.removedRpms.size() == 0}">
+                        No RPM changes
+                    </j:when>
+                    <j:otherwise>
+                        ${rpms.removedRpms.size()} RPMs removed
+                    </j:otherwise>
+                </j:choose>
+            </j:otherwise>
+        </j:choose>
+    </t:summary>
+</j:jelly>
