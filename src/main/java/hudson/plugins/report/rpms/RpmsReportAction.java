@@ -23,13 +23,18 @@
  */
 package hudson.plugins.report.rpms;
 
+import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import hudson.model.Job;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 
 import static hudson.plugins.report.rpms.Constants.RPMS_ALL;
@@ -37,7 +42,7 @@ import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
 import static hudson.plugins.report.rpms.Constants.RPMS_NEW;
 import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 
-public class RpmsReportAction implements Action, StaplerProxy {
+public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
 
     private final AbstractBuild<?, ?> build;
 
@@ -85,6 +90,16 @@ public class RpmsReportAction implements Action, StaplerProxy {
             }
         }
         return null;
+    }
+
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        Job<?, ?> job = build.getParent();
+        if (/* getAction(Class) produces a StackOverflowError */!Util.filter(job.getActions(), RpmsReportProjectAction.class).isEmpty()) {
+            // JENKINS-26077: someone like XUnitPublisher already added one
+            return Collections.emptySet();
+        }
+        return Collections.singleton(new RpmsReportProjectAction(job));
     }
 
 }

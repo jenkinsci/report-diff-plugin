@@ -1,0 +1,53 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
+    <script src="${rootURL}/plugin/jenkins-report-rpms/Chart.js"></script>
+    <canvas id="rpmsChart" width="500" height="200"></canvas>
+    <script type="text/javascript">
+        //<![CDATA[
+        var data = {
+            labels: [],
+            datasets: []
+        };
+        var options = {
+            bezierCurve: false
+        };
+        // Get the context of the canvas element we want to select
+        var ctx = document.getElementById("rpmsChart").getContext("2d");
+        var myNewChart = new Chart(ctx).Line(data, options);
+        //]]>
+    </script>
+    <table>
+        <thead>
+            <tr>
+                <th>New RPMs</th>
+                <th>Removed RPMs</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div style="font-family: monospace">
+                        <ul>
+                            <j:forEach var="rpm" items="${action.newRpms}">
+                                <li>
+                                    ${rpm}
+                                </li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    <div style="font-family: monospace">
+                        <ul>
+                            <j:forEach var="rpm" items="${action.removedRpms}">
+                                <li>
+                                    ${rpm}
+                                </li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</j:jelly>
