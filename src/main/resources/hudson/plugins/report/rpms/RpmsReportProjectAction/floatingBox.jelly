@@ -1,53 +1,67 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-    <script src="${rootURL}/plugin/jenkins-report-rpms/Chart.js"></script>
     <canvas id="rpmsChart" width="500" height="200"></canvas>
+    <script src="${rootURL}/plugin/jenkins-report-rpms/Chart.js"></script>
+    <j:set var="chartData" value="${action.chartData}" />
     <script type="text/javascript">
-        //<![CDATA[
+        // &lt;![CDATA[
         var data = {
-            labels: [],
-            datasets: []
+        labels: [
+        <j:forEach var="build" items="${chartData.builds}" varStatus="status">
+        "${build}"<j:if test="${!status.last}">,</j:if>
+        </j:forEach>
+        ],
+                datasets: [
+                {
+                label: "Installed",
+                        fillColor: "rgba(128,255,128,0.2)",
+                        strokeColor: "rgba(128,255,128,1)",
+                        pointColor: "rgba(128,255,128,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(128,255,128,1)",
+                        data: [
+        <j:forEach var="installed" items="${chartData.installed}" varStatus="status">
+            ${installed}<j:if test="${!status.last}">,</j:if>
+        </j:forEach>
+                        ]
+                },
+                {
+                label: "Removed",
+                        fillColor: "rgba(255,128,128,0.2)",
+                        strokeColor: "rgba(255,128,128,1)",
+                        pointColor: "rgba(255,128,128,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(255,128,128,1)",
+                        data: [
+        <j:forEach var="removed" items="${chartData.removed}" varStatus="status">
+            ${removed}<j:if test="${!status.last}">,</j:if>
+        </j:forEach>
+                        ]
+                },
+                {
+                label: "Total",
+                        fillColor: "rgba(128,128,128,0.2)",
+                        strokeColor: "rgba(128,128,128,1)",
+                        pointColor: "rgba(128,128,128,1)",
+                        pointStrokeColor: "#fff",
+                        pointHighlightFill: "#fff",
+                        pointHighlightStroke: "rgba(128,128,128,1)",
+                        data: [
+        <j:forEach var="total" items="${chartData.total}" varStatus="status">
+            ${total}<j:if test="${!status.last}">,</j:if>
+        </j:forEach>
+                        ]
+                }
+                ]
         };
         var options = {
-            bezierCurve: false
+        bezierCurve: false
         };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart").getContext("2d");
         var myNewChart = new Chart(ctx).Line(data, options);
-        //]]>
+        // ]]&gt;
     </script>
-    <table>
-        <thead>
-            <tr>
-                <th>New RPMs</th>
-                <th>Removed RPMs</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <div style="font-family: monospace">
-                        <ul>
-                            <j:forEach var="rpm" items="${action.newRpms}">
-                                <li>
-                                    ${rpm}
-                                </li>
-                            </j:forEach>
-                        </ul>
-                    </div>
-                </td>
-                <td>
-                    <div style="font-family: monospace">
-                        <ul>
-                            <j:forEach var="rpm" items="${action.removedRpms}">
-                                <li>
-                                    ${rpm}
-                                </li>
-                            </j:forEach>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
 </j:jelly>
