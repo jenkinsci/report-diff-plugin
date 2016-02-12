@@ -34,8 +34,6 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -44,7 +42,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -63,41 +60,11 @@ public class RpmsReportPublisher extends Recorder {
         this.command = command;
     }
 
-    private List<String> executeCommand() throws OperationFailedException {
-        if (command == null || command.trim().isEmpty()) {
-            throw new OperationFailedException("No command specified");
-        }
-        try {
-            Process process = new ProcessBuilder(command.trim().split(" ")).start();
-            OutputReader stdoutReader = new OutputReader(process.getInputStream()).start();
-            OutputReader stderrReader = new OutputReader(process.getErrorStream()).start();
-            if (!process.waitFor(60, TimeUnit.SECONDS)) {
-                throw new OperationFailedException("Command time out");
-            }
-            if (stderrReader.getResult() != null) {
-                throw new OperationFailedException(stderrReader.getResult());
-            }
-            String stdout = stdoutReader.getResult();
-            if (stdout == null) {
-                throw new OperationFailedException("Command produced no output");
-            }
-            List<String> list = StringSpliterator.splitString(stdout, "\n")
-                    .filter(s -> s != null && s.length() > 0)
-                    .sorted()
-                    .collect(Collectors.toList());
-            return list;
-        } catch (OperationFailedException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new OperationFailedException(ex.toString());
-        }
-    }
-
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         try {
 
-            List<String> rpms = executeCommand();
+            List<String> rpms = build.getWorkspace().act(new CommandCallable(command));
             Files.write(new File(build.getRootDir(), RPMS_ALL).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
             AbstractBuild previousBuild = build.getPreviousBuild();
@@ -167,51 +134,4 @@ public class RpmsReportPublisher extends Recorder {
 
     }
 
-    private class OutputReader implements Runnable {
-
-        private final InputStream stream;
-        private String result;
-
-        public OutputReader(InputStream stream) {
-            this.stream = stream;
-        }
-
-        public String getResult() {
-            return result;
-        }
-
-        @Override
-        public void run() {
-            try (InputStreamReader in = new InputStreamReader(stream, "UTF-8")) {
-                StringBuilder sb = new StringBuilder();
-                char[] buffer = new char[8192];
-                int read;
-                while ((read = in.read(buffer)) != -1) {
-                    sb.append(buffer, 0, read);
-                }
-                if (sb.length() > 0) {
-                    result = sb.toString();
-                }
-            } catch (Exception ex) {
-                result = ex.toString();
-            }
-        }
-
-        public OutputReader start() {
-            Thread t = new Thread(this);
-            t.setPriority(Thread.MIN_PRIORITY);
-            t.setName("RPMs Report - Output Reader - '" + command + "'");
-            t.start();
-            return this;
-        }
-
-    }
-
-    private class OperationFailedException extends Exception {
-
-        public OperationFailedException(String message) {
-            super(message);
-        }
-
-    }
 }
