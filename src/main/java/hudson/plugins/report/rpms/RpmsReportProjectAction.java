@@ -59,46 +59,43 @@ public class RpmsReportProjectAction implements Action {
         return "rpms";
     }
 
-    public RpmsReportChart getChartData() {
-        List<String> builds = new ArrayList<>();
-        List<String> installed = new ArrayList<>();
-        List<String> removed = new ArrayList<>();
-        List<String> total = new ArrayList<>();
+    public List<RpmsReportChartPoint> getChartData() {
+        List<RpmsReportChartPoint> list = new ArrayList<>();
         for (Run run : job.getBuilds()) {
 
             File allFile = new File(run.getRootDir(), RPMS_ALL);
             if (!checkFile(allFile)) {
                 continue;
             }
-            builds.add(run.getDisplayName());
-            total.add(fileLines(allFile));
-            installed.add(fileLines(new File(run.getRootDir(), RPMS_NEW)));
-            removed.add(fileLines(new File(run.getRootDir(), RPMS_REMOVED)));
 
-            if (builds.size() == 10) {
+            list.add(new RpmsReportChartPoint(
+                    run.getNumber(),
+                    run.getDisplayName(),
+                    fileLines(new File(run.getRootDir(), RPMS_NEW)),
+                    fileLines(new File(run.getRootDir(), RPMS_REMOVED)),
+                    fileLines(allFile)));
+
+            if (list.size() == 10) {
                 break;
             }
         }
-        Collections.reverse(builds);
-        Collections.reverse(installed);
-        Collections.reverse(removed);
-        Collections.reverse(total);
-        return new RpmsReportChart(builds, installed, removed, total);
+        Collections.reverse(list);
+        return list;
     }
 
     private boolean checkFile(File f) {
         return f.exists() && f.isFile() && f.canRead();
     }
 
-    private String fileLines(File f) {
+    private int fileLines(File f) {
         if (checkFile(f)) {
             try {
                 int number = Files.readAllLines(f.toPath()).size();
-                return String.valueOf(number);
+                return number;
             } catch (Exception ignore) {
             }
         }
-        return "0";
+        return 0;
     }
 
 }

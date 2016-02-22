@@ -23,35 +23,39 @@
  */
 package hudson.plugins.report.rpms;
 
-import java.util.List;
+public class RpmsReportChartPoint {
 
-public class RpmsReportChart {
+    private final int buildNumber;
+    private final String buildName;
+    private final int installed;
+    private final int removed;
+    private final int total;
 
-    private final List<String> builds;
-    private final List<String> installed;
-    private final List<String> removed;
-    private final List<String> total;
-
-    public RpmsReportChart(List<String> builds, List<String> installed, List<String> removed, List<String> total) {
-        this.builds = builds;
+    public RpmsReportChartPoint(int buildNumber, String buildName, int installed, int removed, int total) {
+        this.buildNumber = buildNumber;
+        this.buildName = buildName;
         this.installed = installed;
         this.removed = removed;
         this.total = total;
     }
 
-    public List<String> getBuilds() {
-        return builds;
+    public int getBuildNumber() {
+        return buildNumber;
     }
 
-    public List<String> getInstalled() {
+    public String getBuildName() {
+        return buildName;
+    }
+
+    public int getInstalled() {
         return installed;
     }
 
-    public List<String> getRemoved() {
+    public int getRemoved() {
         return removed;
     }
 
-    public List<String> getTotal() {
+    public int getTotal() {
         return total;
     }
 

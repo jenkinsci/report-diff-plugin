@@ -1,13 +1,14 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='200'></canvas></div>
-    <j:set var="chartData" value="${action.chartData}" />
+    <h3 style="font-family: monospace">RPM Changes</h3>
+    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='250'></canvas></div>
+            <j:set var="chartData" value="${action.chartData}" />
     <script type="text/javascript">
         // &lt;![CDATA[
         var data = {
         labels: [
-        <j:forEach var="build" items="${chartData.builds}" varStatus="status">
-        "${build}"<j:if test="${!status.last}">,</j:if>
+        <j:forEach var="build" items="${chartData}" varStatus="status">
+        "${build.buildName}"<j:if test="${!status.last}">,</j:if>
         </j:forEach>
         ],
                 datasets: [
@@ -20,8 +21,8 @@
                         pointHighlightFill: "#fff",
                         pointHighlightStroke: "rgba(128,255,128,1)",
                         data: [
-        <j:forEach var="installed" items="${chartData.installed}" varStatus="status">
-            ${installed}<j:if test="${!status.last}">,</j:if>
+        <j:forEach var="build" items="${chartData}" varStatus="status">
+            ${build.installed}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
                         ]
                 },
@@ -34,8 +35,8 @@
                         pointHighlightFill: "#fff",
                         pointHighlightStroke: "rgba(255,128,128,1)",
                         data: [
-        <j:forEach var="removed" items="${chartData.removed}" varStatus="status">
-            ${removed}<j:if test="${!status.last}">,</j:if>
+        <j:forEach var="removed" items="${chartData}" varStatus="status">
+            ${build.removed}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
                         ]
                 },
@@ -48,22 +49,26 @@
                         pointHighlightFill: "#fff",
                         pointHighlightStroke: "rgba(128,128,128,1)",
                         data: [
-        <j:forEach var="total" items="${chartData.total}" varStatus="status">
-            ${total}<j:if test="${!status.last}">,</j:if>
+        <j:forEach var="total" items="${chartData}" varStatus="status">
+            ${build.total}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
                         ]
                 }
                 ]
         };
         var options = {
-        bezierCurve: false
+        bezierCurve: false,
+                multiTooltipTemplate: "&lt;%= datasetLabel + \": \" + value %&gt;"
         };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart").getContext("2d");
         var rpmsChart = new Chart(ctx).Line(data, options);
+        <j:forEach var="build" items="${chartData}" varStatus="status">
+        buildsMap["${build.buildName}"] = "${build.buildNumber}";
+        </j:forEach>
         document.getElementById("rpmsChartContainer").onclick = function(evt){
         var activePoints = rpmsChart.getPointsAtEvent(evt);
-        window.open(activePoints[0].label.replace("#", ""), "_blank");
+        window.open(buildsMap[activePoints[0].label] + "/rpms", "_blank");
         };
         // ]]&gt;
     </script>
