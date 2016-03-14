@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 
@@ -81,10 +82,8 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     private List<String> readFile(String fileName) {
         File file = new File(build.getRootDir(), fileName);
         if (file.exists() && file.isFile() && file.canRead()) {
-            try {
-                return Files
-                        .lines(file.toPath(), StandardCharsets.UTF_8)
-                        .collect(Collectors.toList());
+            try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
+                return stream.collect(Collectors.toList());
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -95,7 +94,8 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     @Override
     public Collection<? extends Action> getProjectActions() {
         Job<?, ?> job = build.getParent();
-        if (/* getAction(Class) produces a StackOverflowError */!Util.filter(job.getActions(), RpmsReportProjectAction.class).isEmpty()) {
+        if (/* getAction(Class) produces a StackOverflowError */!Util.filter(
+                        job.getActions(), RpmsReportProjectAction.class).isEmpty()) {
             // JENKINS-26077: someone like XUnitPublisher already added one
             return Collections.emptySet();
         }
