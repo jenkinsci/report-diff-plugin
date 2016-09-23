@@ -33,9 +33,12 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.jenkinsci.remoting.RoleChecker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommandCallable implements FileCallable<List<String>> {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CommandCallable.class);
     private final String command;
 
     public CommandCallable(String command) {
@@ -48,6 +51,7 @@ public class CommandCallable implements FileCallable<List<String>> {
     @Override
     public List<String> invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
         try {
+            LOG.info("Executting `" + command.trim() + "` in" + f.toString() + " (" + f.getAbsolutePath() + ")");
             Process process = new ProcessBuilder(command.trim().split(" "))
                     .directory(f)
                     .start();
@@ -56,6 +60,19 @@ public class CommandCallable implements FileCallable<List<String>> {
             if (!process.waitFor(60, TimeUnit.SECONDS)) {
                 throw new OperationFailedException("Command time out");
             }
+            LOG.info("Returned " + process.exitValue());
+            Thread.sleep(10); //giving time to pipes to finish
+            try {
+                process.getInputStream().close();
+            } catch (Exception ex) {
+            }
+            try {
+                process.getErrorStream().close();
+            } catch (Exception ex) {
+            }
+            Thread.sleep(10); //giving time to pipes to finish
+            LOG.info("sout read " + stdoutReader.getBytes());
+            LOG.info("serr read " + stderrReader.getBytes());
             if (stderrReader.getResult() != null) {
                 throw new OperationFailedException(stderrReader.getResult());
             }
@@ -84,6 +101,7 @@ public class CommandCallable implements FileCallable<List<String>> {
         private final String command;
         private final InputStream stream;
         private String result;
+        private int bytes = 0;
 
         public OutputReader(String command, InputStream stream) {
             this.command = command;
@@ -94,6 +112,11 @@ public class CommandCallable implements FileCallable<List<String>> {
             return result;
         }
 
+        public int getBytes() {
+            return bytes;
+        }
+        
+
         @Override
         public void run() {
             try (InputStreamReader in = new InputStreamReader(stream, "UTF-8")) {
@@ -101,6 +124,7 @@ public class CommandCallable implements FileCallable<List<String>> {
                 char[] buffer = new char[8192];
                 int read;
                 while ((read = in.read(buffer)) != -1) {
+                    bytes+=read;
                     sb.append(buffer, 0, read);
                 }
                 if (sb.length() > 0) {
