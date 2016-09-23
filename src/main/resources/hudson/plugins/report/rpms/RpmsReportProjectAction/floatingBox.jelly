@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
     <h3 style="font-family: monospace">RPM Changes</h3>
-    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='250'></canvas></div>
+    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='500'></canvas></div>
             <j:set var="chartData" value="${action.chartData}" />
     <script type="text/javascript">
         // &lt;![CDATA[
