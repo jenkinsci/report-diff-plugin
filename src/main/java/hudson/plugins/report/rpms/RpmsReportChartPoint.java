@@ -23,10 +23,13 @@
  */
 package hudson.plugins.report.rpms;
 
+import hudson.plugins.Chartjs;
+
 public class RpmsReportChartPoint {
 
     private final int buildNumber;
     private final String buildName;
+    private final String buildNameShortened;
     private final int installed;
     private final int removed;
     private final int total;
@@ -34,10 +37,17 @@ public class RpmsReportChartPoint {
     public RpmsReportChartPoint(int buildNumber, String buildName, int installed, int removed, int total) {
         this.buildNumber = buildNumber;
         this.buildName = buildName;
+        this.buildNameShortened=Chartjs.getShortName(buildName);
         this.installed = installed;
         this.removed = removed;
         this.total = total;
     }
+
+    public String getBuildNameShortened() {
+        return buildNameShortened;
+    }
+    
+    
 
     public int getBuildNumber() {
         return buildNumber;
