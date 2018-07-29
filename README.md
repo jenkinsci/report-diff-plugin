@@ -23,3 +23,5 @@ You can see it really is comand, not file what you put here. By cat you simply r
 
 
 Long story short, this plugin, however versatile have issues in quick readability. Still we find it useful and so may you
+
+This plugin depends on https://github.com/judovana/jenkins-report-generic-chart-column
