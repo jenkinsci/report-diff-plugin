@@ -2,8 +2,8 @@
 Jenkins plugin to create the list of RPMs installed in the system
 
 * [Job run details](#job)
-    * [Project state graph](#project)
-* [tooltip](#tooltip)
+* [Project state graph](#project)
+    * [tooltip](#tooltip)
 * [Settings](#settings)
 * [Limitations](#limitations)
     
