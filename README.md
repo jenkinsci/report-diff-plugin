@@ -10,7 +10,7 @@ Jenkins plugin to create the list of RPMs installed in the system
 This plugin allows you to monitor changes of packages on your system. It can actually observe difference between any stream-able source (like file) where unit is an line.
 
 ## Job
-Most detailed is project's run view:
+Most detailed is from project's run view. In job build screen, simple ```RPM Changes: X RPMs installed, Y RPMs removed``` is provided, where **RPM Changes** is link to following screen:
 ![run](https://user-images.githubusercontent.com/2904395/43015810-eb0c74fe-8c50-11e8-8420-ec3fb8df6037.png)
 You can nicely see what lines (packages in our case)  had changed.
 
