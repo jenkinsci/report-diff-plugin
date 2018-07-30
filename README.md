@@ -5,7 +5,7 @@ Jenkins plugin to create the list of RPMs installed in the system
     * [Project state graph](#project)
 * [tooltip](#tooltip)
 * [Settings](#settings)
-* [Limitations](#limmitations)
+* [Limitations](#limitations)
     
 This plugin allows you to monitor changes of packages on your system. It can actually observe difference between any stream-able source (like file) where unit is an line.
 
@@ -31,7 +31,7 @@ When you look to the sedttings:
 ![settings](https://user-images.githubusercontent.com/2904395/43122741-60e40448-8f22-11e8-84c2-de47d9c8e4be.png)
 You can see it really is comand, not file what you put here. By cat you simply read archived file. We were experimenting with direct "rpm -qa"  or "ssh machine "cat or rpm query" so the file was not requested to be archived, nor the script should require list generation. However that resolved to be tricky - sometimes the provider was vm, sometimes HW host, sometimes it crashed and so. So the cat from archived list was sad winner.
 
-## Limmitations
+## Limitations
 Long story short, this plugin, however versatile have issues in quick readability. Still we find it useful and so may you
 
 This plugin depends on https://github.com/judovana/jenkins-report-generic-chart-column
