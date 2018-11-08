@@ -37,7 +37,7 @@ public class RpmsReportChartPoint {
     public RpmsReportChartPoint(int buildNumber, String buildName, int installed, int removed, int total) {
         this.buildNumber = buildNumber;
         this.buildName = buildName;
-        this.buildNameShortened=Chartjs.getShortName(buildName);
+        this.buildNameShortened=Chartjs.getShortName(buildName, buildNumber);
         this.installed = installed;
         this.removed = removed;
         this.total = total;
