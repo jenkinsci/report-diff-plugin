@@ -24,7 +24,6 @@
 package hudson.plugins.report.rpms;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -78,7 +77,7 @@ public class RpmsReportPublisher extends Recorder {
 
         @Override
         public String getDisplayName() {
-            return "Installed RPMs report";
+            return DefaultStrings.MAIN_TITLE_REPORT;
         }
 
         @Override

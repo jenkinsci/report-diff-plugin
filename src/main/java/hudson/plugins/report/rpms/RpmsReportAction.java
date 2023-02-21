@@ -58,12 +58,28 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return "RPM Changes";
+        return DefaultStrings.MAIN_TITLE;
     }
 
     @Override
     public String getUrlName() {
         return "rpms";
+    }
+
+    public String getNoChanges() {
+        return DefaultStrings.NO_CHNAGES;
+    }
+
+    public String getChanged() {
+        return DefaultStrings.UPDATED_LINES;
+    }
+
+    public String getAdded() {
+        return DefaultStrings.ADDED_LINES;
+    }
+
+    public String getRemoved() {
+        return DefaultStrings.REMOVED_LINES;
     }
 
     @Override

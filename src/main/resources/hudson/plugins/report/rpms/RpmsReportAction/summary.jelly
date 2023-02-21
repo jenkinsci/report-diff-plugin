@@ -8,20 +8,20 @@
             <j:when test="${rpms.newRpms.size() != 0}">
                 <j:choose>
                     <j:when test="${rpms.newRpms.size() == rpms.removedRpms.size()}">
-                        ${rpms.newRpms.size()} RPMs updated
+                        ${rpms.newRpms.size()} ${it.changed}
                     </j:when>
                     <j:when test="${rpms.removedRpms.size() == 0}">
-                        ${rpms.newRpms.size()} RPMs installed
+                        ${rpms.newRpms.size()} ${it.added}
                     </j:when>
                     <j:otherwise>
-                        ${rpms.newRpms.size()} RPMs installed, ${rpms.removedRpms.size()} RPMs removed
+                        ${rpms.newRpms.size()} ${it.added}, ${rpms.removedRpms.size()} ${it.removed}
                     </j:otherwise>
                 </j:choose>
             </j:when>
             <j:otherwise>
                 <j:choose>
                     <j:when test="${rpms.removedRpms.size() == 0}">
-                        No RPM changes
+                        ${it.noChanges}
                     </j:when>
                     <j:otherwise>
                         ${rpms.removedRpms.size()} RPMs removed

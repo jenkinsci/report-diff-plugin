@@ -5,13 +5,13 @@
             <h1><st:out value="${it.title}" /></h1>
 
             <j:if test="${it.stderr != null}">
-                <h2>Command stderr output</h2>
+                <h2>${it.errorHeader}</h2>
                 <div style="font-family: monospace">
                     ${it.stderr}
                 </div>
             </j:if>
             <j:if test="${it.newRpms != null}">
-                <h2>Newly installed RPMs:</h2>
+                <h2>${it.addedHeader}</h2>
                 <div style="font-family: monospace">
                     <ul>
                         <j:forEach var="rpm" items="${it.newRpms}">
@@ -23,7 +23,7 @@
                 </div>
             </j:if>
             <j:if test="${it.removedRpms != null}">
-                <h2>Removed RPMs:</h2>
+                <h2>${it.removedHeader}</h2>
                 <div style="font-family: monospace">
                     <ul>
                         <j:forEach var="rpm" items="${it.removedRpms}">
@@ -35,7 +35,7 @@
                 </div>
             </j:if>
             <j:if test="${it.allRpms != null}">
-                <h2>All RPMs:</h2>
+                <h2>${it.allHeader}</h2>
                 <div style="font-family: monospace">
                     <ul>
                         <j:forEach var="rpm" items="${it.allRpms}">

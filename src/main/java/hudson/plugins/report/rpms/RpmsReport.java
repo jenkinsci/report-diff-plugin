@@ -55,4 +55,21 @@ public class RpmsReport {
         return allRpms;
     }
 
+    public String getErrorHeader() {
+        return DefaultStrings.ERROR_TITLE;
+    }
+
+    public String getAddedHeader() {
+        return DefaultStrings.ADDED_LINES_LONG;
+    }
+
+    public String getRemovedHeader() {
+        return DefaultStrings.REMOVED_LINES_LONG;
+    }
+
+    public String getAllHeader() {
+        return DefaultStrings.ALL_LINES_LONG;
+    }
+
+
 }

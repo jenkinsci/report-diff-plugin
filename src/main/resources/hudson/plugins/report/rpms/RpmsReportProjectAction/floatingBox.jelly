@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-    <h3 style="font-family: monospace">RPM Changes</h3>
+    <h3 style="font-family: monospace">${action.displayName}</h3>
     <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='500'></canvas></div>
             <j:set var="chartData" value="${action.chartData}" />
     <script type="text/javascript">
@@ -13,7 +13,7 @@
         ],
                 datasets: [
                 {
-                label: "Installed",
+                label: "${action.chartInstalled}",
                         fillColor: "rgba(128,255,128,0.2)",
                         strokeColor: "rgba(128,255,128,1)",
                         pointColor: "rgba(128,255,128,1)",
@@ -27,7 +27,7 @@
                         ]
                 },
                 {
-                label: "Removed",
+                label: "${action.chartRemoved}",
                         fillColor: "rgba(255,128,128,0.2)",
                         strokeColor: "rgba(255,128,128,1)",
                         pointColor: "rgba(255,128,128,1)",
@@ -41,7 +41,7 @@
                         ]
                 },
                 {
-                label: "Total",
+                label: "${action.chartTotal}",
                         fillColor: "rgba(128,128,128,0.2)",
                         strokeColor: "rgba(128,128,128,1)",
                         pointColor: "rgba(128,128,128,1)",

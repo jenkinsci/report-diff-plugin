@@ -51,7 +51,7 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return "RPM changes";
+        return DefaultStrings.MAIN_TITLE;
     }
 
     @Override
@@ -96,6 +96,18 @@ public class RpmsReportProjectAction implements Action {
             }
         }
         return 0;
+    }
+
+    public String getChartInstalled() {
+        return DefaultStrings.ADDED_LINES_SHORT;
+    }
+
+    public String getChartTotal() {
+        return DefaultStrings.ALL_LINES_SHORT;
+    }
+
+    public String getChartRemoved() {
+        return DefaultStrings.REMOVED_LINES_SHORT;
     }
 
 }
