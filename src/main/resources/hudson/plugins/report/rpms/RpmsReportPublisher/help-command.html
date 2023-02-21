@@ -1,4 +1,6 @@
 <div>
-    The command that outputs list of all the RPMs installed on the target system. For example:<br/>
-    <span style="font-family: monospace">ssh user1@host1 rpm -qa</span><br/>
+    The command that outputs list of Strings for comapre. For example:<br/>
+    <span style="font-family: monospace"> rpm -qa or </span> or <span style="font-family: monospace"> env</span><br/>
+    Or jsut file to be read, if exists (otherwise interpreted as command)<br/>
+    command is run/file located in workspace. Is processed, and stored where it should be - jenkins_home/jobs/jobname/buildid/rpms-{all,new,removed}.txt<br/>
 </div>
