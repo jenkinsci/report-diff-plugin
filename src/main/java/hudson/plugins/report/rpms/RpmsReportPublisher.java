@@ -24,6 +24,7 @@
 package hudson.plugins.report.rpms;
 
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -62,9 +63,15 @@ public class RpmsReportPublisher extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        if (build == null ) { //spotbugs issue, otherwise never hit
+            throw new IOException("No build found");
+        }
         try {
-
-            List<String> rpms = build.getWorkspace().act(new CommandCallable(command));
+            FilePath ws = build.getWorkspace();
+            if (ws == null ) { //spotbugs issue, otherwise never hit
+                throw new IOException("No workspace found");
+            }
+            List<String> rpms = ws.act(new CommandCallable(command));
             Files.write(new File(build.getRootDir(), RPMS_ALL).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
             AbstractBuild previousBuild = build.getPreviousBuild();
