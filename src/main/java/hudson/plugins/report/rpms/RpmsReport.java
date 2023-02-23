@@ -31,12 +31,14 @@ public class RpmsReport {
     private final List<String> newRpms;
     private final List<String> removedRpms;
     private final List<String> allRpms;
+    private final String project;
 
-    public RpmsReport(String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
+    public RpmsReport(String project, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
         this.stderr = stderr;
         this.newRpms = newRpms;
         this.removedRpms = removedRpms;
         this.allRpms = allRpms;
+        this.project = project;
     }
 
     public String getStderr() {
@@ -56,19 +58,19 @@ public class RpmsReport {
     }
 
     public String getErrorHeader() {
-        return DefaultStrings.ERROR_TITLE;
+        return DefaultStrings.ERROR_TITLE.get(project);
     }
 
     public String getAddedHeader() {
-        return DefaultStrings.ADDED_LINES_LONG;
+        return DefaultStrings.ADDED_LINES_LONG.get(project);
     }
 
     public String getRemovedHeader() {
-        return DefaultStrings.REMOVED_LINES_LONG;
+        return DefaultStrings.REMOVED_LINES_LONG.get(project);
     }
 
     public String getAllHeader() {
-        return DefaultStrings.ALL_LINES_LONG;
+        return DefaultStrings.ALL_LINES_LONG.get(project);
     }
 
 

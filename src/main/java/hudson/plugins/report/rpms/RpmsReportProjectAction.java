@@ -51,7 +51,7 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE;
+        return DefaultStrings.MAIN_TITLE.get(job.getName());
     }
 
     @Override
@@ -99,15 +99,15 @@ public class RpmsReportProjectAction implements Action {
     }
 
     public String getChartInstalled() {
-        return DefaultStrings.ADDED_LINES_SHORT;
+        return DefaultStrings.ADDED_LINES_SHORT.get(job.getName());
     }
 
     public String getChartTotal() {
-        return DefaultStrings.ALL_LINES_SHORT;
+        return DefaultStrings.ALL_LINES_SHORT.get(job.getName());
     }
 
     public String getChartRemoved() {
-        return DefaultStrings.REMOVED_LINES_SHORT;
+        return DefaultStrings.REMOVED_LINES_SHORT.get(job.getName());
     }
 
 }

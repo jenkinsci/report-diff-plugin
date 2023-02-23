@@ -3,5 +3,47 @@
     <f:entry field="command" title="Command or file">
         <f:textbox />
     </f:entry>
+    <f:section title="Set custom titles">
+      <f:advanced>
+      <!-- Todo, wouldbe fnd to repalce hardcoded defaults to code refference, but I have nto found how-->
+      <p><b>Warning! The advanced titles are hackish, and may need build run after each reset or change to take effect properly.</b></p>
+        <f:entry field="maintitle" title="Main title (chart and link to details), defaults to `Diff chart`. Creative example for `rpm -qa` command: `RPM Changes`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="nochanges" title="String (build details) indicating no difference from previous run. Defaults to `No Changes`. Creative example for `rpm -qa` command: `No RPM Changes`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="updatedlines" title="String (build details) showing count of changed lines against previous run. Defaults to `Changed lines`. Creative example for `rpm -qa` command: `RPMs updated`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="addedlines" title="String (build details) showing count of new/added lines against previous run. Defaults to `Added lines`. Creative example for `rpm -qa` command: `RPMs installed`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="removedlines" title="String (build details) showing count of removed lines against previous run. Defaults to `Removed lines`. Creative example for `rpm -qa` command: `RPMs removed`">
+          <f:textbox />
+        </f:entry>
+         <f:entry field="errortitle" title="String (details listing report) header for error during command execution or file reading. Defaults to `Command stderr output`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="addedlineslong"  title="String (details listing report) header for new/added lines against previous run. Defaults to `New lines:`. Creative example for `rpm -qa` command: `Newly installed RPMs:`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="removedlineslong"  title="String (details listing report) header for missing lines against previous run. Defaults to `Removed lines:`. Creative example for `rpm -qa` command: `Removed RPMs:`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="alllineslong"  title="String (details listing report) header for listing of all lines innew run. Defaults to `All lines:`. Creative example for `rpm -qa` command: `All RPMs:`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="addedlinesshort"  title="Short string (chart tooltip, green) number of added lines against previous run. Defaults to `Added`. Creative example for `rpm -qa` command: `Installed`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="removedlinesshort"  title="Short string (chart tooltip, red) number of removed lines against previous run. Defaults to `Deleted`. Creative example for `rpm -qa` command: `Remvoed`">
+          <f:textbox />
+        </f:entry>
+        <f:entry field="alllinesshort"  title="Short string (chart tooltip, grey) number of all lines in selected run. Defaults to `All`. Creative example for `rpm -qa` command: `Total`">
+          <f:textbox />
+        </f:entry>
+      </f:advanced>
+    </f:section>
 </j:jelly>
 

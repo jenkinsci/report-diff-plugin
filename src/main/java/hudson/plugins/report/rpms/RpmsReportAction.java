@@ -58,7 +58,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE;
+        return DefaultStrings.MAIN_TITLE.get(build.getProject().getName());
     }
 
     @Override
@@ -67,19 +67,19 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     }
 
     public String getNoChanges() {
-        return DefaultStrings.NO_CHNAGES;
+        return DefaultStrings.NO_CHANGES.get(build.getProject().getName());
     }
 
     public String getChanged() {
-        return DefaultStrings.UPDATED_LINES;
+        return DefaultStrings.UPDATED_LINES.get(build.getProject().getName());
     }
 
     public String getAdded() {
-        return DefaultStrings.ADDED_LINES;
+        return DefaultStrings.ADDED_LINES.get(build.getProject().getName());
     }
 
     public String getRemoved() {
-        return DefaultStrings.REMOVED_LINES;
+        return DefaultStrings.REMOVED_LINES.get(build.getProject().getName());
     }
 
     @Override
@@ -89,6 +89,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
         List<String> allRpms = readFile(RPMS_ALL);
         List<String> stderrs = readFile(RPMS_COMMAND_STDERR);
         return new RpmsReport(
+                build.getProject().getName(),
                 stderrs == null ? null : stderrs.stream().findFirst().orElse(null),
                 newRpms,
                 removedRpms,
