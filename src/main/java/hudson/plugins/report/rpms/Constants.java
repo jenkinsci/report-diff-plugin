@@ -25,9 +25,28 @@ package hudson.plugins.report.rpms;
 
 final public class Constants {
 
-    public static final String RPMS_NEW = "rpms-new.txt";
-    public static final String RPMS_REMOVED = "rpms-removed.txt";
-    public static final String RPMS_ALL = "rpms-all.txt";
-    public static final String RPMS_COMMAND_STDERR = "rpms-stderr.txt";
+    public static String getNEW(String id) {
+        return idToString(id) + "-new.txt";
+    }
+
+    public static String getREMOVED(String id) {
+        return idToString(id) + "-removed.txt";
+    }
+
+    public static String getALL(String id) {
+        return idToString(id) + "-all.txt";
+    }
+
+    public static String getCOMMAND_STDERR(String id) {
+        return idToString(id) + "-stderr.txt";
+    }
+
+    private static String idToString(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            return "rpms";
+        } else {
+            return id;
+        }
+    }
 
 }

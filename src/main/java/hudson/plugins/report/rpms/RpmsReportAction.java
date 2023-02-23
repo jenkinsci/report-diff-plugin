@@ -43,10 +43,6 @@ import hudson.util.DescribableList;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 
-import static hudson.plugins.report.rpms.Constants.RPMS_ALL;
-import static hudson.plugins.report.rpms.Constants.RPMS_COMMAND_STDERR;
-import static hudson.plugins.report.rpms.Constants.RPMS_NEW;
-import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 
 public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
 

@@ -38,9 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static hudson.plugins.report.rpms.Constants.RPMS_ALL;
-import static hudson.plugins.report.rpms.Constants.RPMS_NEW;
-import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 
 public class RpmsReportProjectAction implements Action {
 
