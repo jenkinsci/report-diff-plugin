@@ -1,7 +1,12 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+
+  <f:repeatable field="configurations">
     <f:entry field="command" title="Command or file">
         <f:textbox />
+    </f:entry>
+      <f:entry field="id" title="ID of this comaprsion. If you change it, you will lost (or change) baseline. Two same IDs will rewrite each other">
+         <f:textbox />
     </f:entry>
     <f:section title="Set custom titles">
       <f:advanced>
@@ -44,5 +49,7 @@
         </f:entry>
       </f:advanced>
     </f:section>
+    <f:repeatableDeleteButton/>
+  </f:repeatable>
 </j:jelly>
 

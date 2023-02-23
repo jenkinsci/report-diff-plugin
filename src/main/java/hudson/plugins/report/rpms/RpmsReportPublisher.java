@@ -42,6 +42,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 public class RpmsReportPublisher extends Recorder {
 
     private String command;
+    private String id;
     private String maintitle;
     private String nochanges;
     private String updatedlines;
@@ -56,9 +57,10 @@ public class RpmsReportPublisher extends Recorder {
     private String alllinesshort;
 
     @DataBoundConstructor
-    public RpmsReportPublisher(String command, String maintitle, String nochanges, String updatedlines, String addedlines, String removedlines, String errortitle, String addedlineslong,
-                               String removedlineslong, String alllineslong, String addedlinesshort, String removedlinesshort, String alllinesshort) {
+    public RpmsReportPublisher(String command, String id, String maintitle, String nochanges, String updatedlines, String addedlines, String removedlines, String errortitle, String addedlineslong,
+            String removedlineslong, String alllineslong, String addedlinesshort, String removedlinesshort, String alllinesshort) {
         this.command = command;
+        this.id = id;
         this.maintitle = maintitle;
         this.nochanges = nochanges;
         this.updatedlines = updatedlines;
@@ -91,6 +93,10 @@ public class RpmsReportPublisher extends Recorder {
 
     public String getCommand() {
         return command;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getMaintitle() {
@@ -144,6 +150,11 @@ public class RpmsReportPublisher extends Recorder {
     @DataBoundSetter
     public void setCommand(String command) {
         this.command = command;
+    }
+
+    @DataBoundSetter
+    public void setId(String id) {
+        this.id = id;
     }
 
     @DataBoundSetter
