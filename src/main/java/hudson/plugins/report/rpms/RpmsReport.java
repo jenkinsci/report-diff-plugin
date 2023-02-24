@@ -23,11 +23,6 @@
  */
 package hudson.plugins.report.rpms;
 
-import hudson.model.AbstractProject;
-import hudson.model.Descriptor;
-import hudson.tasks.Publisher;
-import hudson.util.DescribableList;
-
 import java.util.List;
 
 public class RpmsReport {
@@ -36,21 +31,14 @@ public class RpmsReport {
     private final List<String> newRpms;
     private final List<String> removedRpms;
     private final List<String> allRpms;
-    private final AbstractProject<?, ?> project;
-    private RpmsReportPublisher publisher;
+    private RpmsReportOneRecord publisher;
 
-    public RpmsReport(AbstractProject<?, ?> project, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
+    public RpmsReport(RpmsReportOneRecord publisher, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
+        this.publisher = publisher;
         this.stderr = stderr;
         this.newRpms = newRpms;
         this.removedRpms = removedRpms;
         this.allRpms = allRpms;
-        this.project = project;
-        DescribableList<Publisher, Descriptor<Publisher>> l = project.getPublishersList();
-        for (Publisher p : l.toArray(new Publisher[0])) {
-            if (p instanceof RpmsReportPublisher) {
-                publisher = (RpmsReportPublisher) p;
-            }
-        }
     }
 
     public String getStderr() {

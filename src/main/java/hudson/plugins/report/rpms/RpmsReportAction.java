@@ -29,14 +29,10 @@ import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
@@ -69,7 +65,8 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return getPublisher().getMaintitle();
+        //return getPublisher().getMaintitle();
+        return "TEST2";
     }
 
     @Override
@@ -77,47 +74,17 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
         return "rpms";
     }
 
-    public String getNoChanges() {
-        return getPublisher().getNochanges();
-    }
-
-    public String getChanged() {
-        return getPublisher().getUpdatedlines();
-    }
-
-    public String getAdded() {
-        return getPublisher().getAddedlines();
-    }
-
-    public String getRemoved() {
-        return getPublisher().getRemovedlines();
-    }
 
     @Override
-    public RpmsReport getTarget() {
-        List<String> newRpms = readFile(RPMS_NEW);
-        List<String> removedRpms = readFile(RPMS_REMOVED);
-        List<String> allRpms = readFile(RPMS_ALL);
-        List<String> stderrs = readFile(RPMS_COMMAND_STDERR);
-        return new RpmsReport(
-                build.getProject(),
-                stderrs == null ? null : stderrs.stream().findFirst().orElse(null),
-                newRpms,
-                removedRpms,
-                allRpms);
+    public List<RpmsReportActionOneSummary> getTarget() {
+        List<RpmsReportActionOneSummary> reports = new ArrayList<>();
+        for(RpmsReportOneRecord record: getPublisher().getConfigurations()) {
+            reports.add(new RpmsReportActionOneSummary(record, build));
+        }
+         return reports;
     }
 
-    private List<String> readFile(String fileName) {
-        File file = new File(build.getRootDir(), fileName);
-        if (file.exists() && file.isFile() && file.canRead()) {
-            try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
-                return stream.collect(Collectors.toList());
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        return null;
-    }
+
 
     @Override
     public Collection<? extends Action> getProjectActions() {

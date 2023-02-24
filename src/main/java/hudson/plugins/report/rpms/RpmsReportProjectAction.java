@@ -25,17 +25,12 @@ package hudson.plugins.report.rpms;
 
 import hudson.model.Action;
 import hudson.model.Descriptor;
-import hudson.model.FreeStyleProject;
 import hudson.model.Job;
 import hudson.model.Project;
-import hudson.model.Run;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -61,7 +56,8 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return publisher.getMaintitle();
+        //return publisher.getMaintitle();
+        return "TEST1";
     }
 
     @Override
@@ -69,55 +65,13 @@ public class RpmsReportProjectAction implements Action {
         return "rpms";
     }
 
-    public List<RpmsReportChartPoint> getChartData() {
-        List<RpmsReportChartPoint> list = new ArrayList<>();
-        for (Run run : job.getBuilds()) {
-
-            File allFile = new File(run.getRootDir(), RPMS_ALL);
-            if (!checkFile(allFile)) {
-                continue;
-            }
-
-            list.add(new RpmsReportChartPoint(
-                    run.getNumber(),
-                    run.getDisplayName(),
-                    fileLines(new File(run.getRootDir(), RPMS_NEW)),
-                    fileLines(new File(run.getRootDir(), RPMS_REMOVED)),
-                    fileLines(allFile)));
-
-            if (list.size() == 10) {
-                break;
-            }
+    public List<RpmsReportProjectActionOneChart> getChartData() {
+        List<RpmsReportProjectActionOneChart> list = new ArrayList<>();
+        for(RpmsReportOneRecord record: publisher.getConfigurations()) {
+            list.add(new RpmsReportProjectActionOneChart(record, publisher, job));
         }
-        Collections.reverse(list);
         return list;
     }
 
-    private boolean checkFile(File f) {
-        return f.exists() && f.isFile() && f.canRead();
-    }
-
-    private int fileLines(File f) {
-        if (checkFile(f)) {
-            try {
-                int number = Files.readAllLines(f.toPath()).size();
-                return number;
-            } catch (Exception ignore) {
-            }
-        }
-        return 0;
-    }
-
-    public String getChartInstalled() {
-        return publisher.getAddedlinesshort();
-    }
-
-    public String getChartTotal() {
-        return publisher.getAlllinesshort();
-    }
-
-    public String getChartRemoved() {
-        return publisher.getRemovedlinesshort();
-    }
 
 }

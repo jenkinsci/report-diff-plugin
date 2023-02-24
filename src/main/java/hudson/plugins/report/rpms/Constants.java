@@ -25,6 +25,7 @@ package hudson.plugins.report.rpms;
 
 final public class Constants {
 
+
     public static String getNEW(String id) {
         return idToString(id) + "-new.txt";
     }

@@ -42,19 +42,24 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 public class RpmsReportPublisher extends Recorder {
 
-    private List<RpmsReportOneDiff> configurations;
+    private List<RpmsReportOneRecord> configurations;
+    private int buildstopast;
 
     @DataBoundConstructor
-    public RpmsReportPublisher(List<RpmsReportOneDiff> configurations) {
+    public RpmsReportPublisher(int buildstopast, List<RpmsReportOneRecord> configurations) {
         this.configurations = configurations;
+        this.buildstopast = buildstopast;
     }
 
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        for(RpmsReportOneDiff configuration: configurations) {
-            /*return*/ new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build, launcher, listener);
+        boolean result = true;
+        for (RpmsReportOneRecord configuration : configurations) {
+            boolean run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build, launcher, listener);
+            result = run && result;
         }
+        return result;
     }
 
     @Override
@@ -67,13 +72,22 @@ public class RpmsReportPublisher extends Recorder {
         return BuildStepMonitor.NONE;
     }
 
-    public List<RpmsReportOneDiff> getConfigurations() {
+    public List<RpmsReportOneRecord> getConfigurations() {
         return configurations;
     }
 
+    public int getBuildstopast() {
+        return buildstopast <= 0 ? 10 : buildstopast;
+    }
+
     @DataBoundSetter
-    public void setConfigurations(List<RpmsReportOneDiff> configurations) {
+    public void setConfigurations(List<RpmsReportOneRecord> configurations) {
         this.configurations = configurations;
+    }
+
+    @DataBoundSetter
+    public void setBuildstopast(int buildstopast) {
+        this.buildstopast = buildstopast;
     }
 
     @Extension
