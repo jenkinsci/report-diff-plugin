@@ -23,19 +23,55 @@
  */
 package hudson.plugins.report.rpms;
 
+import java.util.List;
 
-public class RpmsReport {
+public class RpmsReportSingle {
 
-    private final RpmsReportPublisher publisher;
+    private final String stderr;
+    private final List<String> newRpms;
+    private final List<String> removedRpms;
+    private final List<String> allRpms;
+    private RpmsReportOneRecord publisher;
 
-    public RpmsReport(RpmsReportPublisher publisher) {
+    public RpmsReportSingle(RpmsReportOneRecord publisher, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
         this.publisher = publisher;
-        for(RpmsReportOneRecord record: this.publisher.getConfigurations()) {
-            System.out.println(record);
-        }
+        this.stderr = stderr;
+        this.newRpms = newRpms;
+        this.removedRpms = removedRpms;
+        this.allRpms = allRpms;
     }
 
+    public String getStderr() {
+        return stderr;
+    }
 
+    public List<String> getNewRpms() {
+        return newRpms;
+    }
+
+    public List<String> getRemovedRpms() {
+        return removedRpms;
+    }
+
+    public List<String> getAllRpms() {
+        return allRpms;
+    }
+
+    public String getErrorHeader() {
+        return publisher.getErrortitle();
+    }
+
+    public String getAddedHeader() {
+        return publisher.getAddedlineslong();
+    }
+
+    public String getRemovedHeader() {
+        return publisher.getRemovedlineslong();
+    }
+
+    public String getAllHeader() {
+        return publisher.getAlllineslong();
+    }
 
 
 }

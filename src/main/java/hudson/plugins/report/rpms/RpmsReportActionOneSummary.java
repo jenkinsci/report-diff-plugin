@@ -29,7 +29,6 @@ import hudson.model.AbstractBuild;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -38,12 +37,23 @@ import java.util.stream.Stream;
 public class RpmsReportActionOneSummary {
 
 
+    private final String stderr;
+    private final List<String> newRpms;
+    private final List<String> removedRpms;
+    private final List<String> allRpms;
+
     private final RpmsReportOneRecord publisher;
     private final AbstractBuild<?, ?> build;
 
-    public RpmsReportActionOneSummary(RpmsReportOneRecord publisher, AbstractBuild<?, ?> build) {
-        this.publisher = publisher;
-        this.build = build;
+    public RpmsReportActionOneSummary(AbstractBuild<?, ?> build, RpmsReportOneRecord publisher) {
+       this.publisher = publisher;
+       this.build = build;
+       newRpms = readFile(Constants.getNEW(getID()));
+       removedRpms = readFile(Constants.getREMOVED(getID()));
+       allRpms = readFile(Constants.getALL(getID()));
+       List<String> lstderrs = readFile(Constants.getCOMMAND_STDERR(getID()));
+       stderr = lstderrs == null ? null : lstderrs.stream().findFirst().orElse(null);
+
     }
 
     private RpmsReportOneRecord getPublisher() {
@@ -75,19 +85,6 @@ public class RpmsReportActionOneSummary {
         return getPublisher().getId();
     }
 
-    public RpmsReport getTarget() {
-        List<String> newRpms = readFile(Constants.getNEW(getID()));
-        List<String> removedRpms = readFile(Constants.getREMOVED(getID()));
-        List<String> allRpms = readFile(Constants.getALL(getID()));
-        List<String> stderrs = readFile(Constants.getCOMMAND_STDERR(getID()));
-        return new RpmsReport(
-                getPublisher(),
-                stderrs == null ? null : stderrs.stream().findFirst().orElse(null),
-                newRpms,
-                removedRpms,
-                allRpms);
-
-    }
 
     private List<String> readFile(String fileName) {
         File file = new File(build.getRootDir(), fileName);

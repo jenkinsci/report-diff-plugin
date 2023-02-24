@@ -76,12 +76,8 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
 
     @Override
-    public List<RpmsReportActionOneSummary> getTarget() {
-        List<RpmsReportActionOneSummary> reports = new ArrayList<>();
-        for(RpmsReportOneRecord record: getPublisher().getConfigurations()) {
-            reports.add(new RpmsReportActionOneSummary(record, build));
-        }
-         return reports;
+    public RpmsReport getTarget() {
+        return  new RpmsReport(getPublisher());
     }
 
 
