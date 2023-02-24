@@ -26,7 +26,9 @@ package hudson.plugins.report.rpms;
 import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import hudson.model.Descriptor;
 import hudson.model.Job;
+
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -35,6 +37,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import hudson.tasks.Publisher;
+import hudson.util.DescribableList;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 
@@ -51,6 +56,16 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
         this.build = build;
     }
 
+    private RpmsReportPublisher getPublisher() {
+        DescribableList<Publisher, Descriptor<Publisher>> l = build.getProject().getPublishersList();
+        for (Publisher p : l.toArray(new Publisher[0])) {
+            if (p instanceof RpmsReportPublisher) {
+                return (RpmsReportPublisher) p;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getIconFileName() {
         return "clipboard.png";
@@ -58,7 +73,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE.get(build.getProject().getName());
+        return getPublisher().getMaintitle();
     }
 
     @Override
@@ -67,19 +82,19 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     }
 
     public String getNoChanges() {
-        return DefaultStrings.NO_CHANGES.get(build.getProject().getName());
+        return getPublisher().getNochanges();
     }
 
     public String getChanged() {
-        return DefaultStrings.UPDATED_LINES.get(build.getProject().getName());
+        return getPublisher().getUpdatedlines();
     }
 
     public String getAdded() {
-        return DefaultStrings.ADDED_LINES.get(build.getProject().getName());
+        return getPublisher().getAddedlines();
     }
 
     public String getRemoved() {
-        return DefaultStrings.REMOVED_LINES.get(build.getProject().getName());
+        return getPublisher().getRemovedlines();
     }
 
     @Override
@@ -89,7 +104,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
         List<String> allRpms = readFile(RPMS_ALL);
         List<String> stderrs = readFile(RPMS_COMMAND_STDERR);
         return new RpmsReport(
-                build.getProject().getName(),
+                build.getProject(),
                 stderrs == null ? null : stderrs.stream().findFirst().orElse(null),
                 newRpms,
                 removedRpms,

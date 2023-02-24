@@ -24,8 +24,14 @@
 package hudson.plugins.report.rpms;
 
 import hudson.model.Action;
+import hudson.model.Descriptor;
+import hudson.model.FreeStyleProject;
 import hudson.model.Job;
+import hudson.model.Project;
 import hudson.model.Run;
+import hudson.tasks.Publisher;
+import hudson.util.DescribableList;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -39,9 +45,16 @@ import static hudson.plugins.report.rpms.Constants.RPMS_REMOVED;
 public class RpmsReportProjectAction implements Action {
 
     private final Job<?, ?> job;
+    private RpmsReportPublisher publisher;
 
     public RpmsReportProjectAction(Job<?, ?> job) {
         this.job = job;
+        DescribableList<Publisher, Descriptor<Publisher>> l = ((Project) job).getPublishersList();
+        for (Publisher p : l.toArray(new Publisher[0])) {
+            if (p instanceof RpmsReportPublisher) {
+                publisher = (RpmsReportPublisher) p;
+            }
+        }
     }
 
     @Override
@@ -51,7 +64,7 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE.get(job.getName());
+        return publisher.getMaintitle();
     }
 
     @Override
@@ -99,15 +112,15 @@ public class RpmsReportProjectAction implements Action {
     }
 
     public String getChartInstalled() {
-        return DefaultStrings.ADDED_LINES_SHORT.get(job.getName());
+        return publisher.getAddedlinesshort();
     }
 
     public String getChartTotal() {
-        return DefaultStrings.ALL_LINES_SHORT.get(job.getName());
+        return publisher.getAlllinesshort();
     }
 
     public String getChartRemoved() {
-        return DefaultStrings.REMOVED_LINES_SHORT.get(job.getName());
+        return publisher.getRemovedlinesshort();
     }
 
 }
