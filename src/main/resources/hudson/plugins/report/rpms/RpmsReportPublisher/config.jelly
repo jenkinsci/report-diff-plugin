@@ -6,7 +6,6 @@
     <f:section title="Set custom titles">
       <f:advanced>
       <!-- Todo, wouldbe fnd to repalce hardcoded defaults to code refference, but I have nto found how-->
-      <p><b>Warning! The advanced titles are hackish, and may need build run after each reset or change to take effect properly.</b></p>
         <f:entry field="maintitle" title="Main title (chart and link to details), defaults to `Diff chart`. Creative example for `rpm -qa` command: `RPM Changes`">
           <f:textbox />
         </f:entry>

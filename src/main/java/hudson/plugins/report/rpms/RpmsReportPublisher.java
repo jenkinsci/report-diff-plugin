@@ -41,24 +41,23 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 public class RpmsReportPublisher extends Recorder {
 
-    private String command = null;
-    private String maintitle = DefaultStrings.MAIN_TITLE.get("init");
-    private String nochanges = DefaultStrings.NO_CHANGES.get("init");
-    private String updatedlines = DefaultStrings.UPDATED_LINES.get("init");
-    private String addedlines = DefaultStrings.ADDED_LINES.get("init");
-    private String removedlines = DefaultStrings.REMOVED_LINES.get("init");
-    private String errortitle = DefaultStrings.ERROR_TITLE.get("init");
-    private String addedlineslong = DefaultStrings.ADDED_LINES_LONG.get("init");
-    private String removedlineslong = DefaultStrings.REMOVED_LINES_LONG.get("init");
-    private String alllineslong = DefaultStrings.ALL_LINES_LONG.get("init");
-    private String addedlinesshort = DefaultStrings.ADDED_LINES_SHORT.get("init");
-    private String removedlinesshort = DefaultStrings.REMOVED_LINES_SHORT.get("init");
-    private String alllinesshort = DefaultStrings.ALL_LINES_SHORT.get("init");
-    private String lastProject = null;
+    private String command;
+    private String maintitle;
+    private String nochanges;
+    private String updatedlines;
+    private String addedlines;
+    private String removedlines;
+    private String errortitle;
+    private String addedlineslong;
+    private String removedlineslong;
+    private String alllineslong;
+    private String addedlinesshort;
+    private String removedlinesshort;
+    private String alllinesshort;
 
     @DataBoundConstructor
     public RpmsReportPublisher(String command, String maintitle, String nochanges, String updatedlines, String addedlines, String removedlines, String errortitle, String addedlineslong,
-            String removedlineslong, String alllineslong, String addedlinesshort, String removedlinesshort, String alllinesshort) {
+                               String removedlineslong, String alllineslong, String addedlinesshort, String removedlinesshort, String alllinesshort) {
         this.command = command;
         this.maintitle = maintitle;
         this.nochanges = nochanges;
@@ -72,32 +71,12 @@ public class RpmsReportPublisher extends Recorder {
         this.addedlinesshort = addedlinesshort;
         this.removedlinesshort = removedlinesshort;
         this.alllinesshort = alllinesshort;
-        setAll();
     }
 
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        lastProject = build.getProject().getName();
-        setAll();
         return new RpmsReportPublisherImpl(command).perform(build, launcher, listener);
-    }
-
-    private void setAll() {
-        if (lastProject != null) {
-            DefaultStrings.MAIN_TITLE.set(lastProject, maintitle);
-            DefaultStrings.NO_CHANGES.set(lastProject, nochanges);
-            DefaultStrings.UPDATED_LINES.set(lastProject, updatedlines);
-            DefaultStrings.ADDED_LINES.set(lastProject, addedlines);
-            DefaultStrings.REMOVED_LINES.set(lastProject, removedlines);
-            DefaultStrings.ERROR_TITLE.set(lastProject, errortitle);
-            DefaultStrings.ADDED_LINES_LONG.set(lastProject, addedlineslong);
-            DefaultStrings.REMOVED_LINES_LONG.set(lastProject, removedlineslong);
-            DefaultStrings.ADDED_LINES_LONG.set(lastProject, alllineslong);
-            DefaultStrings.ADDED_LINES_SHORT.set(lastProject, addedlinesshort);
-            DefaultStrings.REMOVED_LINES_SHORT.set(lastProject, removedlinesshort);
-            DefaultStrings.ADDED_LINES_SHORT.set(lastProject, alllinesshort);
-        }
     }
 
     @Override
@@ -115,129 +94,116 @@ public class RpmsReportPublisher extends Recorder {
     }
 
     public String getMaintitle() {
-        return maintitle;
+        return DefaultStrings.get(maintitle, DefaultStrings.MAIN_TITLE);
     }
 
     public String getNochanges() {
-        return nochanges;
+        return DefaultStrings.get(nochanges, DefaultStrings.NO_CHANGES);
     }
 
     public String getUpdatedlines() {
-        return updatedlines;
+        return DefaultStrings.get(updatedlines, DefaultStrings.UPDATED_LINES);
     }
 
     public String getAddedlines() {
-        return addedlines;
+        return DefaultStrings.get(addedlines, DefaultStrings.ADDED_LINES);
     }
 
     public String getRemovedlines() {
-        return removedlines;
+        return DefaultStrings.get(removedlines, DefaultStrings.REMOVED_LINES);
     }
 
     public String getErrortitle() {
-        return errortitle;
+        return DefaultStrings.get(errortitle, DefaultStrings.ERROR_TITLE);
     }
 
     public String getAddedlineslong() {
-        return addedlineslong;
+        return DefaultStrings.get(addedlineslong, DefaultStrings.ADDED_LINES_LONG);
     }
 
     public String getRemovedlineslong() {
-        return removedlineslong;
+        return DefaultStrings.get(removedlineslong, DefaultStrings.REMOVED_LINES_LONG);
     }
 
     public String getAlllineslong() {
-        return alllineslong;
+        return DefaultStrings.get(alllineslong, DefaultStrings.ALL_LINES_LONG);
     }
 
     public String getAddedlinesshort() {
-        return addedlinesshort;
+        return DefaultStrings.get(addedlinesshort, DefaultStrings.ADDED_LINES_SHORT);
     }
 
     public String getRemovedlinesshort() {
-        return removedlinesshort;
+        return DefaultStrings.get(removedlinesshort, DefaultStrings.REMOVED_LINES_SHORT);
     }
 
     public String getAlllinesshort() {
-        return alllinesshort;
+        return DefaultStrings.get(alllinesshort, DefaultStrings.ALL_LINES_SHORT);
     }
 
     @DataBoundSetter
     public void setCommand(String command) {
         this.command = command;
-        setAll();
     }
 
     @DataBoundSetter
     public void setMaintitle(String maintitle) {
         this.maintitle = maintitle;
-        setAll();
     }
 
     @DataBoundSetter
     public void setNochanges(String nochanges) {
         this.nochanges = nochanges;
-        setAll();
     }
 
     @DataBoundSetter
     public void setUpdatedlines(String updatedlines) {
         this.updatedlines = updatedlines;
-        setAll();
     }
 
     @DataBoundSetter
     public void setAddedlines(String addedlines) {
         this.addedlines = addedlines;
-        setAll();
     }
 
     @DataBoundSetter
     public void setRemovedlines(String removedlines) {
         this.removedlines = removedlines;
-        setAll();
     }
 
     @DataBoundSetter
     public void setErrortitle(String errortitle) {
         this.errortitle = errortitle;
-        setAll();
     }
 
     @DataBoundSetter
     public void setAddedlineslong(String addedlineslong) {
         this.addedlineslong = addedlineslong;
-        setAll();
     }
 
     @DataBoundSetter
     public void setRemovedlineslong(String removedlineslong) {
         this.removedlineslong = removedlineslong;
-        setAll();
     }
 
     @DataBoundSetter
     public void setAlllineslong(String alllineslong) {
         this.alllineslong = alllineslong;
-        setAll();
     }
 
     @DataBoundSetter
     public void setAddedlinesshort(String addedlinesshort) {
         this.addedlinesshort = addedlinesshort;
-        setAll();
     }
 
     @DataBoundSetter
     public void setRemovedlinesshort(String removedlinesshort) {
         this.removedlinesshort = removedlinesshort;
-        setAll();
     }
 
     @DataBoundSetter
     public void setAlllinesshort(String alllinesshort) {
         this.alllinesshort = alllinesshort;
-        setAll();
     }
 
     @Extension

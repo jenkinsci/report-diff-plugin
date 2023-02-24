@@ -23,6 +23,11 @@
  */
 package hudson.plugins.report.rpms;
 
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.tasks.Publisher;
+import hudson.util.DescribableList;
+
 import java.util.List;
 
 public class RpmsReport {
@@ -31,14 +36,21 @@ public class RpmsReport {
     private final List<String> newRpms;
     private final List<String> removedRpms;
     private final List<String> allRpms;
-    private final String project;
+    private final AbstractProject<?, ?> project;
+    private RpmsReportPublisher publisher;
 
-    public RpmsReport(String project, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
+    public RpmsReport(AbstractProject<?, ?> project, String stderr, List<String> newRpms, List<String> removedRpms, List<String> allRpms) {
         this.stderr = stderr;
         this.newRpms = newRpms;
         this.removedRpms = removedRpms;
         this.allRpms = allRpms;
         this.project = project;
+        DescribableList<Publisher, Descriptor<Publisher>> l = project.getPublishersList();
+        for (Publisher p : l.toArray(new Publisher[0])) {
+            if (p instanceof RpmsReportPublisher) {
+                publisher = (RpmsReportPublisher) p;
+            }
+        }
     }
 
     public String getStderr() {
@@ -58,19 +70,19 @@ public class RpmsReport {
     }
 
     public String getErrorHeader() {
-        return DefaultStrings.ERROR_TITLE.get(project);
+        return publisher.getErrortitle();
     }
 
     public String getAddedHeader() {
-        return DefaultStrings.ADDED_LINES_LONG.get(project);
+        return publisher.getAddedlineslong();
     }
 
     public String getRemovedHeader() {
-        return DefaultStrings.REMOVED_LINES_LONG.get(project);
+        return publisher.getRemovedlineslong();
     }
 
     public String getAllHeader() {
-        return DefaultStrings.ALL_LINES_LONG.get(project);
+        return publisher.getAlllineslong();
     }
 
 
