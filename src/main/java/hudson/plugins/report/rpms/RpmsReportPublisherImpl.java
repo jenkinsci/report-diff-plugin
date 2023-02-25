@@ -66,8 +66,6 @@ public class RpmsReportPublisherImpl {
         } catch (OperationFailedException ex) {
             Files.write(new File(build.getRootDir(), Constants.getCOMMAND_STDERR(id)).toPath(), Arrays.asList(ex.getMessage()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         }
-        RpmsReportAction action = new RpmsReportAction(build);
-        build.addAction(action);
         return true;
     }
 }

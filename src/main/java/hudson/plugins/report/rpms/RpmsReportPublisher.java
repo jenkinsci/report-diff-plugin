@@ -59,6 +59,8 @@ public class RpmsReportPublisher extends Recorder {
             boolean run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build, launcher, listener);
             result = run && result;
         }
+        RpmsReportAction action = new RpmsReportAction(build);
+        build.addAction(action);
         return result;
     }
 

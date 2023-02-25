@@ -1,9 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-
   <f:entry field="buildstopast" title="builds to past to show in charts">
     <f:number />
   </f:entry>
+  <h3>Individual commands/files to comapre in time.<u>Always fill ID!</u></h3>
   <f:repeatable field="configurations">
     <f:entry field="command" title="Command or file">
         <f:textbox />
@@ -13,7 +13,7 @@
     </f:entry>
     <f:section title="Set custom titles">
       <f:advanced>
-      <!-- Todo, wouldbe fnd to repalce hardcoded defaults to code refference, but I have nto found how-->
+      <!-- Todo, would be fine to repalce hardcoded defaults to code refference, but I have nto found how-->
         <f:entry field="maintitle" title="Main title (chart and link to details), defaults to `Diff chart`. Creative example for `rpm -qa` command: `RPM Changes`">
           <f:textbox />
         </f:entry>
