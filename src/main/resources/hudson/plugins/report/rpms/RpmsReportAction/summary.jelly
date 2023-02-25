@@ -1,33 +1,37 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
     <t:summary icon="clipboard.png">
-        <a href="${it.urlName}/">${it.displayName}</a>
+        <a href="${it.urlName}/">${it.displayName}:</a>
         <st:nbsp/>
         <j:set var="rpms" value="${it.target}"/>
-        <j:choose>
-            <j:when test="${rpms.newRpms.size() != 0}">
+        <j:forEach var="report" items="${rpms.reports}">
+            <li> ${report.displayName}:<st:nbsp/>
                 <j:choose>
-                    <j:when test="${rpms.newRpms.size() == rpms.removedRpms.size()}">
-                        ${rpms.newRpms.size()} ${it.changed}
-                    </j:when>
-                    <j:when test="${rpms.removedRpms.size() == 0}">
-                        ${rpms.newRpms.size()} ${it.added}
+                    <j:when test="${report.newRpms.size() != 0}">
+                        <j:choose>
+                            <j:when test="${report.newRpms.size() == report.removedRpms.size()}">
+                                ${report.newRpms.size()} ${report.changed}
+                            </j:when>
+                            <j:when test="${report.removedRpms.size() == 0}">
+                                ${report.newRpms.size()} ${report.added}
+                            </j:when>
+                            <j:otherwise>
+                                ${report.newRpms.size()} ${report.added}, ${report.removedRpms.size()} ${report.removed}
+                            </j:otherwise>
+                        </j:choose>
                     </j:when>
                     <j:otherwise>
-                        ${rpms.newRpms.size()} ${it.added}, ${rpms.removedRpms.size()} ${it.removed}
+                        <j:choose>
+                            <j:when test="${report.removedRpms.size() == 0}">
+                                ${report.noChanges}
+                            </j:when>
+                            <j:otherwise>
+                                ${report.removedRpms.size()} ${report.removed}
+                            </j:otherwise>
+                        </j:choose>
                     </j:otherwise>
                 </j:choose>
-            </j:when>
-            <j:otherwise>
-                <j:choose>
-                    <j:when test="${rpms.removedRpms.size() == 0}">
-                        ${it.noChanges}
-                    </j:when>
-                    <j:otherwise>
-                        ${rpms.removedRpms.size()} RPMs removed
-                    </j:otherwise>
-                </j:choose>
-            </j:otherwise>
-        </j:choose>
+            </li>
+        </j:forEach>
     </t:summary>
 </j:jelly>

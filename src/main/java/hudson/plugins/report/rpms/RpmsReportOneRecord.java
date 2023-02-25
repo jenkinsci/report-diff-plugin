@@ -83,51 +83,51 @@ public class RpmsReportOneRecord extends Recorder {
     }
 
     public String getMaintitle() {
-        return maintitle;
+        return DefaultStrings.get(maintitle, DefaultStrings.MAIN_TITLE);
     }
 
     public String getNochanges() {
-        return nochanges;
+        return DefaultStrings.get(nochanges, DefaultStrings.NO_CHANGES);
     }
 
     public String getUpdatedlines() {
-        return updatedlines;
+        return DefaultStrings.get(updatedlines, DefaultStrings.UPDATED_LINES);
     }
 
     public String getAddedlines() {
-        return addedlines;
+        return DefaultStrings.get(addedlines, DefaultStrings.ADDED_LINES);
     }
 
     public String getRemovedlines() {
-        return removedlines;
+        return DefaultStrings.get(removedlines, DefaultStrings.REMOVED_LINES);
     }
 
     public String getErrortitle() {
-        return errortitle;
+        return DefaultStrings.get(errortitle, DefaultStrings.ERROR_TITLE);
     }
 
     public String getAddedlineslong() {
-        return addedlineslong;
+        return DefaultStrings.get(addedlineslong, DefaultStrings.ADDED_LINES_LONG);
     }
 
     public String getRemovedlineslong() {
-        return removedlineslong;
+        return DefaultStrings.get(removedlineslong, DefaultStrings.REMOVED_LINES_LONG);
     }
 
     public String getAlllineslong() {
-        return alllineslong;
+        return DefaultStrings.get(alllineslong, DefaultStrings.ALL_LINES_LONG);
     }
 
     public String getAddedlinesshort() {
-        return addedlinesshort;
+        return DefaultStrings.get(addedlinesshort, DefaultStrings.ADDED_LINES_SHORT);
     }
 
     public String getRemovedlinesshort() {
-        return removedlinesshort;
+        return DefaultStrings.get(removedlinesshort, DefaultStrings.REMOVED_LINES_SHORT);
     }
 
     public String getAlllinesshort() {
-        return alllinesshort;
+        return DefaultStrings.get(alllinesshort, DefaultStrings.ALL_LINES_SHORT);
     }
 
     @DataBoundSetter

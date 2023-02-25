@@ -29,10 +29,8 @@ import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
@@ -65,8 +63,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        //return getPublisher().getMaintitle();
-        return "TEST2";
+        return DefaultStrings.MAIN_TITLE_REPORT;
     }
 
     @Override
@@ -77,7 +74,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public RpmsReport getTarget() {
-        return  new RpmsReport(getPublisher());
+        return new RpmsReport(getPublisher(), build);
     }
 
 

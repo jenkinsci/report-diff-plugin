@@ -56,8 +56,7 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getDisplayName() {
-        //return publisher.getMaintitle();
-        return "TEST1";
+        return DefaultStrings.MAIN_TITLE_REPORT;
     }
 
     @Override

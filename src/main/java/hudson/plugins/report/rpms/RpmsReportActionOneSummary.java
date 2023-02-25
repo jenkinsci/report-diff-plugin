@@ -46,13 +46,13 @@ public class RpmsReportActionOneSummary {
     private final AbstractBuild<?, ?> build;
 
     public RpmsReportActionOneSummary(AbstractBuild<?, ?> build, RpmsReportOneRecord publisher) {
-       this.publisher = publisher;
-       this.build = build;
-       newRpms = readFile(Constants.getNEW(getID()));
-       removedRpms = readFile(Constants.getREMOVED(getID()));
-       allRpms = readFile(Constants.getALL(getID()));
-       List<String> lstderrs = readFile(Constants.getCOMMAND_STDERR(getID()));
-       stderr = lstderrs == null ? null : lstderrs.stream().findFirst().orElse(null);
+        this.publisher = publisher;
+        this.build = build;
+        newRpms = readFile(Constants.getNEW(getID()));
+        removedRpms = readFile(Constants.getREMOVED(getID()));
+        allRpms = readFile(Constants.getALL(getID()));
+        List<String> lstderrs = readFile(Constants.getCOMMAND_STDERR(getID()));
+        stderr = lstderrs == null ? null : lstderrs.stream().findFirst().orElse(null);
 
     }
 
@@ -98,4 +98,32 @@ public class RpmsReportActionOneSummary {
         return null;
     }
 
+    public String getStderr() {
+        return stderr;
+    }
+
+    public List<String> getNewRpms() {
+        return newRpms;
+    }
+
+    public List<String> getRemovedRpms() {
+        return removedRpms;
+    }
+
+    public List<String> getAllRpms() {
+        return allRpms;
+    }
+
+    public int getNewRpmsSize() {
+        return newRpms == null ? -1 : +newRpms.size();
+    }
+
+    public int getRemovedRpmsSize() {
+        return removedRpms == null ? -1 : removedRpms.size();
+    }
+
+    public int getAllRpmsSize() {
+        return allRpms == null ? -1 : allRpms.size();
+    }
 }
+

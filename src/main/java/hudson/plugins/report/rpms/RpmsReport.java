@@ -24,18 +24,26 @@
 package hudson.plugins.report.rpms;
 
 
+import hudson.model.AbstractBuild;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class RpmsReport {
 
     private final RpmsReportPublisher publisher;
+    private final List<RpmsReportActionOneSummary> reports;
 
-    public RpmsReport(RpmsReportPublisher publisher) {
+    public RpmsReport(RpmsReportPublisher publisher, AbstractBuild<?, ?> build) {
         this.publisher = publisher;
+        reports = new ArrayList<>();
         for(RpmsReportOneRecord record: this.publisher.getConfigurations()) {
-            System.out.println(record);
+            RpmsReportActionOneSummary r = new RpmsReportActionOneSummary(build, record);
+            reports.add(r);
         }
     }
 
-
-
-
+    public List<RpmsReportActionOneSummary> getReports() {
+        return reports;
+    }
 }
