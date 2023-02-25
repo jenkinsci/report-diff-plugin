@@ -32,18 +32,37 @@ import java.util.List;
 public class RpmsReport {
 
     private final RpmsReportPublisher publisher;
-    private final List<RpmsReportActionOneSummary> reports;
+    private final List<RpmsReportActionOneSummary> summary;
+    private final List<RpmsReportSingle> index;
+    private final AbstractBuild<?, ?> build;
 
     public RpmsReport(RpmsReportPublisher publisher, AbstractBuild<?, ?> build) {
         this.publisher = publisher;
-        reports = new ArrayList<>();
+        this.build = build;
+        summary = new ArrayList<>();
+        index = new ArrayList<>();
         for(RpmsReportOneRecord record: this.publisher.getConfigurations()) {
-            RpmsReportActionOneSummary r = new RpmsReportActionOneSummary(build, record);
-            reports.add(r);
+            RpmsReportActionOneSummary summary1 = new RpmsReportActionOneSummary(build, record);
+            RpmsReportSingle index1 = new RpmsReportSingle(record, summary1.getStderr(), summary1.getNewRpms(), summary1.getRemovedRpms(), summary1.getAllRpms());
+            summary.add(summary1);
+            index.add(index1);
         }
     }
 
-    public List<RpmsReportActionOneSummary> getReports() {
-        return reports;
+    public List<RpmsReportActionOneSummary> getSummary() {
+        return summary;
     }
+
+    public List<RpmsReportSingle> getIndex() {
+        return index;
+    }
+
+    public String getDisplayName() {
+        return DefaultStrings.MAIN_TITLE_REPORT;
+    }
+
+    public String getRun() {
+        return build.getId();
+    }
+
 }

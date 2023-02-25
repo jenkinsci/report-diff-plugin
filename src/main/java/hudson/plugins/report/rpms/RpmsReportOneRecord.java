@@ -26,10 +26,8 @@ package hudson.plugins.report.rpms;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import hudson.tasks.Recorder;
 
-
-public class RpmsReportOneRecord extends Recorder {
+public class RpmsReportOneRecord  {
 
     private String command = null;
     private String id = null;

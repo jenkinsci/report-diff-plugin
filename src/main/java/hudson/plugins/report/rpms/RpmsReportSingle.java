@@ -41,6 +41,10 @@ public class RpmsReportSingle {
         this.allRpms = allRpms;
     }
 
+    public RpmsReportOneRecord getPublisher() {
+        return publisher;
+    }
+
     public String getStderr() {
         return stderr;
     }

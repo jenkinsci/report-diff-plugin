@@ -4,7 +4,7 @@
         <a href="${it.urlName}/">${it.displayName}:</a>
         <st:nbsp/>
         <j:set var="rpms" value="${it.target}"/>
-        <j:forEach var="report" items="${rpms.reports}">
+        <j:forEach var="report" items="${rpms.summary}">
             <li> ${report.displayName}:<st:nbsp/>
                 <j:choose>
                     <j:when test="${report.newRpms.size() != 0}">

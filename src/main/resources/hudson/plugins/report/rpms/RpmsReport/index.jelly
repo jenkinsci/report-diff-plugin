@@ -1,52 +1,65 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
-    <l:layout title="${it.run} ${it.displayName}">
+    <l:layout title="${it.getDisplayName()} #${it.getRun()}">
         <l:main-panel>
-            <h1><st:out value="${it.title}" /></h1>
-
-            <j:if test="${it.stderr != null}">
-                <h2>${it.errorHeader}</h2>
-                <div style="font-family: monospace">
-                    ${it.stderr}
-                </div>
-            </j:if>
-            <j:if test="${it.newRpms != null}">
-                <h2>${it.addedHeader}</h2>
-                <div style="font-family: monospace">
-                    <ul>
-                        <j:forEach var="rpm" items="${it.newRpms}">
-                            <li>
-                                ${rpm}
-                            </li>
-                        </j:forEach>
-                    </ul>
-                </div>
-            </j:if>
-            <j:if test="${it.removedRpms != null}">
-                <h2>${it.removedHeader}</h2>
-                <div style="font-family: monospace">
-                    <ul>
-                        <j:forEach var="rpm" items="${it.removedRpms}">
-                            <li>
-                                ${rpm}
-                            </li>
-                        </j:forEach>
-                    </ul>
-                </div>
-            </j:if>
-            <j:if test="${it.allRpms != null}">
-                <h2>${it.allHeader}</h2>
-                <div style="font-family: monospace">
-                    <ul>
-                        <j:forEach var="rpm" items="${it.allRpms}">
-                            <li>
-                                ${rpm}
-                            </li>
-                        </j:forEach>
-                    </ul>
-                </div>
-            </j:if>
-
+            <h1>${it.getDisplayName()} #${it.getRun()}:</h1>
+            <j:forEach var="report" items="${it.index}">
+                <li>
+                    <a href="#${report.publisher.id}">${report.publisher.maintitle} (${report.publisher.command})
+                        ${report.newRpms.size()}/${report.removedRpms.size()}/${report.allRpms.size()}
+                    </a>
+                </li>
+            </j:forEach>
+            <j:forEach var="report" items="${it.index}">
+                <hr/>
+                <h2 id="${report.publisher.id}">${report.publisher.maintitle}(${report.publisher.command}):</h2>
+                <a href="#${report.publisher.id}-add">${report.addedHeader}</a>
+                <a href="#${report.publisher.id}-rem">${report.removedHeader}</a>
+                <a href="#${report.publisher.id}-all">${report.allHeader}</a>
+                <a href="#${report.publisher.id}-err">${report.errorHeader}</a>
+                <j:if test="${report.stderr != null}">
+                    <h3 id="${report.publisher.id}-err">${report.errorHeader}</h3>
+                    <div style="font-family: monospace">
+                        ${report.stderr}
+                    </div>
+                </j:if>
+                <j:if test="${report.newRpms != null}">
+                    <h3 id="${report.publisher.id}-add">${report.addedHeader} (${report.newRpms.size()})</h3>
+                    <div style="font-family: monospace">
+                        <ul>
+                            <j:forEach var="rpm" items="${report.newRpms}">
+                                <li>
+                                    ${rpm}
+                                </li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </j:if>
+                <j:if test="${report.removedRpms != null}">
+                    <h3 id="${report.publisher.id}-rem">${report.removedHeader} (${report.removedRpms.size()})</h3>
+                    <div style="font-family: monospace">
+                        <ul>
+                            <j:forEach var="rpm" items="${report.removedRpms}">
+                                <li>
+                                    ${rpm}
+                                </li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </j:if>
+                <j:if test="${report.allRpms != null}">
+                    <h3 id="${report.publisher.id}-all">${report.allHeader} (${report.allRpms.size()})</h3>
+                    <div style="font-family: monospace">
+                        <ul>
+                            <j:forEach var="rpm" items="${report.allRpms}">
+                                <li>
+                                    ${rpm}
+                                </li>
+                            </j:forEach>
+                        </ul>
+                    </div>
+                </j:if>
+            </j:forEach>
         </l:main-panel>
     </l:layout>
 </j:jelly>
