@@ -64,7 +64,11 @@ public class RpmsReportProjectAction implements Action {
         return "rpms";
     }
 
-    public List<RpmsReportProjectActionOneChart> getChartData() {
+    public List<RpmsReportChartPoint> getChartData() {
+        return getChartsData().get(0).getChartData();
+    }
+
+    public List<RpmsReportProjectActionOneChart> getChartsData() {
         List<RpmsReportProjectActionOneChart> list = new ArrayList<>();
         for(RpmsReportOneRecord record: publisher.getConfigurations()) {
             list.add(new RpmsReportProjectActionOneChart(record, publisher, job));
