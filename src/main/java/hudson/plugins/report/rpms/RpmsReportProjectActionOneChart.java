@@ -103,4 +103,8 @@ public class RpmsReportProjectActionOneChart {
         return publisher.getRemovedlinesshort();
     }
 
+    public String getId() {
+        return publisher.getId();
+    }
+
 }

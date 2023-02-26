@@ -1,8 +1,10 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
-    <h3 style="font-family: monospace">${action.displayName}</h3>
-    <div id="rpmsChartContainer"><canvas id='rpmsChart' width='500' height='500'></canvas></div>
-            <j:set var="chartData" value="${action.chartData}" />
+<div id="topLevelChartContainer">
+<j:forEach var="chart" items="${action.chartsData}">
+    <h3 style="font-family: monospace">${chart.displayName}</h3>
+    <div id="rpmsChartContainer-${chart.id}"><canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
+    <j:set var="chartData" value="${chart.chartData}" />
     <script type="text/javascript">
         // &lt;![CDATA[
         var data = {
@@ -13,7 +15,7 @@
         ],
                 datasets: [
                 {
-                label: "${action.chartInstalled}",
+                label: "${chart.chartInstalled}",
                         fillColor: "rgba(128,255,128,0.2)",
                         strokeColor: "rgba(128,255,128,1)",
                         pointColor: "rgba(128,255,128,1)",
@@ -27,7 +29,7 @@
                         ]
                 },
                 {
-                label: "${action.chartRemoved}",
+                label: "${chart.chartRemoved}",
                         fillColor: "rgba(255,128,128,0.2)",
                         strokeColor: "rgba(255,128,128,1)",
                         pointColor: "rgba(255,128,128,1)",
@@ -41,7 +43,7 @@
                         ]
                 },
                 {
-                label: "${action.chartTotal}",
+                label: "${chart.chartTotal}",
                         fillColor: "rgba(128,128,128,0.2)",
                         strokeColor: "rgba(128,128,128,1)",
                         pointColor: "rgba(128,128,128,1)",
@@ -61,15 +63,17 @@
                 multiTooltipTemplate: "&lt;%= datasetLabel + \": \" + value %&gt;"
         };
         // Get the context of the canvas element we want to select
-        var ctx = document.getElementById("rpmsChart").getContext("2d");
+        var ctx = document.getElementById("rpmsChart-${chart.id}").getContext("2d");
         var rpmsChart = new Chart(ctx).Line(data, options);
         <j:forEach var="build" items="${chartData}" varStatus="status">
         buildsMap["${build.buildNameShortened}"] = "${build.buildNumber}";
         </j:forEach>
-        document.getElementById("rpmsChartContainer").onclick = function(evt){
+        document.getElementById("rpmsChartContainer-${chart.id}").onclick = function(evt){
         var activePoints = rpmsChart.getPointsAtEvent(evt);
         window.open(buildsMap[activePoints[0].label] + "/rpms", "_blank");
         };
         // ]]&gt;
     </script>
+</j:forEach>
+</div>
 </j:jelly>
