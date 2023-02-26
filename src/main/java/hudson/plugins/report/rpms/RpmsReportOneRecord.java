@@ -23,11 +23,16 @@
  */
 package hudson.plugins.report.rpms;
 
+import hudson.Extension;
+import hudson.model.AbstractProject;
+import hudson.tasks.BuildStepDescriptor;
+import hudson.tasks.Publisher;
+import hudson.tasks.Recorder;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 
-public class RpmsReportOneRecord  {
+public class RpmsReportOneRecord  extends Recorder {
 
     private String command = null;
     private String id = null;
@@ -197,4 +202,25 @@ public class RpmsReportOneRecord  {
         this.alllinesshort = alllinesshort;
     }
 
+    @Override
+    public BuildStepDescriptor getDescriptor() {
+        return DESCRIPTOR;
+    }
+
+    @Extension
+    public static final DescriptorImpl DESCRIPTOR = new DescriptorImpl();
+
+    public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+
+        @Override
+        public String getDisplayName() {
+            return DefaultStrings.MAIN_TITLE_REPORT;
+        }
+
+        @Override
+        public boolean isApplicable(Class<? extends AbstractProject> jobType) {
+            return true;
+        }
+
+    }
 }
