@@ -34,16 +34,26 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import hudson.util.FormValidation;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+
+import javax.servlet.ServletException;
 
 
 public class RpmsReportPublisher extends Recorder {
 
     private List<RpmsReportOneRecord> configurations;
     private int buildstopast;
+    private static final Logger LOGGER = Logger.getLogger(RpmsReportPublisher.class.getName());
 
     @DataBoundConstructor
     public RpmsReportPublisher(int buildstopast, List<RpmsReportOneRecord> configurations) {
@@ -55,13 +65,50 @@ public class RpmsReportPublisher extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         boolean result = true;
-        for (RpmsReportOneRecord configuration : configurations) {
+        for (RpmsReportOneRecord configuration : getConfigurations()) {
             boolean run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build, launcher, listener);
             result = run && result;
         }
         RpmsReportAction action = new RpmsReportAction(build);
         build.addAction(action);
         return result;
+    }
+
+
+    public void validateId() {
+        FormValidation r = doCheckConfigurations(configurations);
+        if (r.kind != FormValidation.Kind.OK) {
+            LOGGER.log(Level.SEVERE, r.getMessage());
+        }
+    }
+
+    /**
+     * It seems that jenkins is unable to verify repeatble element. So we cal this manually by validate if
+     *
+     * @param configurations
+     * @return
+     * @throws IOException
+     * @throws ServletException
+     */
+    public FormValidation doCheckConfigurations(@QueryParameter List<RpmsReportOneRecord> configurations) {
+        Set<String> uniq = new HashSet<>();
+        List<String> uniqRepor = new ArrayList<>(configurations.size());
+        for (RpmsReportOneRecord configuration : configurations) {
+            String value = configuration.getId();
+            if (value == null || value.trim().isEmpty()) {
+                return FormValidation.error("ID must not be empty (and must be unique)");
+            }
+            if (!value.matches("[a-zA-Z]+")) {
+                return FormValidation.error("ID must be just letters a-zA-Z (and must be unique). Is " + value);
+            }
+            uniq.add(value);
+            uniqRepor.add(value);
+        }
+        if (uniq.size() != configurations.size()) {
+            return FormValidation.error("IDs must be unique. Are:" + uniqRepor.toString());
+        }
+        return FormValidation.ok();
+
     }
 
     @Override
@@ -75,6 +122,7 @@ public class RpmsReportPublisher extends Recorder {
     }
 
     public List<RpmsReportOneRecord> getConfigurations() {
+        validateId();
         return configurations;
     }
 
@@ -85,6 +133,7 @@ public class RpmsReportPublisher extends Recorder {
     @DataBoundSetter
     public void setConfigurations(List<RpmsReportOneRecord> configurations) {
         this.configurations = configurations;
+        validateId();
     }
 
     @DataBoundSetter
