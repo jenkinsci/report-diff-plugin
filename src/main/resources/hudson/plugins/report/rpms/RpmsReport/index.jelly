@@ -2,6 +2,22 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
     <l:layout title="${it.getDisplayName()} #${it.getRun()}">
         <l:main-panel>
+            <script type="text/javascript">
+                // &lt;![CDATA[
+                function diffPluginShowHideInlineOne(id) {
+                    diffPluginShowHideOne(id, 'inline')
+                }
+
+                function diffPluginShowHideBlockOne(id) {
+                    diffPluginShowHideOne(id, 'block')
+                }
+
+                function diffPluginShowHideOne(id, type) {
+                var el = document.getElementById(id);
+                if (el.style.display=='none') {el.style.display = type} else {el.style.display = 'none'};
+                }
+            // ]]&gt;
+            </script>
             <h1>${it.getDisplayName()} #${it.getRun()}:</h1>
             <j:forEach var="report" items="${it.index}">
                 <li>
@@ -13,6 +29,7 @@
             <j:forEach var="report" items="${it.index}">
                 <hr/>
                 <h2 id="${report.publisher.id}">${report.publisher.maintitle}(${report.publisher.command}):</h2>
+                <span id="collapsable-${report.publisher.id}">
                 <a href="#${report.publisher.id}-add">${report.addedHeader}</a>
                 <a href="#${report.publisher.id}-rem">${report.removedHeader}</a>
                 <a href="#${report.publisher.id}-all">${report.allHeader}</a>
@@ -59,7 +76,23 @@
                         </ul>
                     </div>
                 </j:if>
+                </span>
             </j:forEach>
+<!--This p/p adds break after the loop for readability -->
+            <p>
+                // &lt;![CDATA[
+                // ]]&gt;
+            </p>
+            <script type="text/javascript">
+            // &lt;![CDATA[
+                <j:forEach var="report" items="${it.index}">
+                    document.getElementById("${report.publisher.id}").onclick = function(evt){
+                      diffPluginShowHideBlockOne("collapsable-${report.publisher.id}")
+                    };
+
+                </j:forEach>
+                // ]]&gt;
+            </script>
         </l:main-panel>
     </l:layout>
 </j:jelly>
