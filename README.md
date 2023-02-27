@@ -5,6 +5,8 @@ Jenkins plugin to monittor comaprable content on system
 * [Project state graph](#project)
     * [tooltip](#tooltip)
 * [Settings](#settings)
+* [Multiple diffs](#multiple-diffs)
+* [Changing build status](#changing-build-status)
 * [Limitations](#limitations)
     
 This plugin allows you to monitor any difference in output of file or of rnu of any command, where unit is an line.
@@ -24,21 +26,32 @@ You can nicely see what lines (packages in our case)  had changed.
 ## Project
 For quick overview, you have in-project graph:
 ![project](https://user-images.githubusercontent.com/2904395/43015811-eb2dc942-8c50-11e8-9bd7-56e71254c7f0.png)
+
 this graph shows  how many lines was in stream, how many lines were removed compared to previous,  how many lines were added.
 
 ### Tooltip
 The tooltip says it in manner of original purpose - difference in lines (installed packages in our example:
 ![tooltip](https://user-images.githubusercontent.com/2904395/43015812-eb4dbe50-8c50-11e8-81fa-b22cc9d0458c.png)
+
 Unluckily the total - blackline, added - green line and removed as red line in one graph was not happy choice. Usually minor adds/removes are not visible. Wehn we do an system update, graph loks like:
 ![update](https://user-images.githubusercontent.com/2904395/43122742-61016178-8f22-11e8-8817-28d6da1dc57e.png)
+
 So although you see major changes, the red and green lines get mixed.
 
 ## Settings
 When you look to the sedttings:
 ![settings](https://user-images.githubusercontent.com/2904395/43122741-60e40448-8f22-11e8-84c2-de47d9c8e4be.png)
+
 You can see it is comand or file what you put here. It operates on workspace, so the file do not need to be archived (as is celar from nature of command xor file)
 
-## Limitations
-You can currently have only one set of diffs
+## Multiple diffs
+You can havew sevral diffs, each comparing different command/file. According to this, several charts is show and several reports is navigable and collapsable in main report. Eah comaprsion have **ID** wich is mandatory to set, and is apointing the base line. Chnage of id == lost/change of baseline. 
+Each of your charts can have separate title, and names of statuses (aka added lines x installed apps x new variables ).
 
+## Changing build status
+You can set up plugin to change build status to unstable if there is change detected by diff.
+You can set up plugin to change build status to failed if there command/readign fails and/or nothing is read.
+
+
+## Limitations
 This plugin depends on https://github.com/judovana/jenkins-chartjs-plugin
