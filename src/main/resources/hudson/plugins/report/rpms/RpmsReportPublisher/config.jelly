@@ -3,13 +3,22 @@
   <f:entry field="buildstopast" title="builds to past to show in charts">
     <f:number />
   </f:entry>
-  <h3>Individual commands/files to comapre in time.<u>Always fill ID!</u></h3>
+  <f:entry field="moveunstable" title="move to unstable if there is change">
+       <f:checkbox/>
+  </f:entry>
+  <f:entry field="movefailed" title="move to failed diff can not be created">
+       <f:checkbox/>
+  </f:entry>
+  <f:entry field="moveempty" title="move to failed if no content is read">
+       <f:checkbox/>
+  </f:entry>
+  <h3>Individual commands/files to compare in time.<u>Always fill ID!</u></h3>
   <f:repeatable field="configurations">
     <f:entry field="command" title="Command or file">
-        <f:textbox />
+        <f:textbox  clazz="required"/>
     </f:entry>
       <f:entry field="id" title="ID of this comaprsion. If you change it, you will lost (or change) baseline. Two same IDs will rewrite each other">
-         <f:textbox />
+         <f:textbox  clazz="required"/>
     </f:entry>
     <f:section title="Set custom titles">
       <f:advanced>
@@ -54,5 +63,8 @@
     </f:section>
     <f:repeatableDeleteButton/>
   </f:repeatable>
+  <f:validateButton
+     title="validate IDs" progress="Testing..."
+     method="validateIds" with="configurations" />
 </j:jelly>
 

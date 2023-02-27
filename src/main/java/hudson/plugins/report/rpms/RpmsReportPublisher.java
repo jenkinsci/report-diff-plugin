@@ -28,6 +28,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
@@ -42,35 +43,69 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.util.FormValidation;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.servlet.ServletException;
 
 
 public class RpmsReportPublisher extends Recorder {
 
+    private boolean moveunstable;
+    private boolean movefailed;
+    private boolean moveempty;
     private List<RpmsReportOneRecord> configurations;
     private int buildstopast;
     private static final Logger LOGGER = Logger.getLogger(RpmsReportPublisher.class.getName());
 
     @DataBoundConstructor
-    public RpmsReportPublisher(int buildstopast, List<RpmsReportOneRecord> configurations) {
+    public RpmsReportPublisher(int buildstopast, boolean moveunstable, boolean movefailed, boolean moveempty, List<RpmsReportOneRecord> configurations) {
         this.configurations = configurations;
         this.buildstopast = buildstopast;
+        this.moveunstable = moveunstable;
+        this.movefailed = movefailed;
+        this.moveempty = moveempty;
     }
 
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         boolean result = true;
+        List<String> changeditems = new ArrayList<>();
+        List<String> failedItems = new ArrayList<>();
+        List<String> emptyItems = new ArrayList<>();
         for (RpmsReportOneRecord configuration : getConfigurations()) {
-            boolean run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build, launcher, listener);
-            result = run && result;
+            RpmsReportPublisherImpl.Result run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build);
+            if (run.isChanged()) {
+                changeditems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
+            }
+            if (run.isBroken()) {
+                failedItems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
+            } else {
+                if (run.isEmpty()) {
+                    emptyItems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
+                }
+            }
         }
         RpmsReportAction action = new RpmsReportAction(build);
         build.addAction(action);
+        FormValidation fv = doCheckConfigurations(configurations);
+        listener.getLogger().println("[diff plugin] ID validation " + fv.kind + " " + fv.getMessage());
+        listener.getLogger().println("[diff plugin] found changes in: " + changeditems);
+        listener.getLogger().println("[diff plugin] possible error in: " + failedItems);
+        listener.getLogger().println("[diff plugin] empty readings: " + emptyItems);
+        if (isMoveunstable() && changeditems.size() > 0) {
+            build.setResult(Result.UNSTABLE);
+        }
+        if (isMovefailed() && failedItems.size() > 0) {
+            build.setResult(Result.FAILURE);
+        }
+        if (isMoveempty() && emptyItems.size() > 0) {
+            build.setResult(Result.FAILURE);
+        }
         return result;
     }
 
@@ -84,11 +119,6 @@ public class RpmsReportPublisher extends Recorder {
 
     /**
      * It seems that jenkins is unable to verify repeatble element. So we cal this manually by validate if
-     *
-     * @param configurations
-     * @return
-     * @throws IOException
-     * @throws ServletException
      */
     public FormValidation doCheckConfigurations(@QueryParameter List<RpmsReportOneRecord> configurations) {
         Set<String> uniq = new HashSet<>();
@@ -98,8 +128,8 @@ public class RpmsReportPublisher extends Recorder {
             if (value == null || value.trim().isEmpty()) {
                 return FormValidation.error("ID must not be empty (and must be unique)");
             }
-            if (!value.matches("[a-zA-Z]+")) {
-                return FormValidation.error("ID must be just letters a-zA-Z (and must be unique). Is " + value);
+            if (!value.matches("[a-zA-Z0-9]+")) {
+                return FormValidation.error("ID must be just letters a-zA-Z0-9 (and must be unique). Is " + value);
             }
             uniq.add(value);
             uniqRepor.add(value);
@@ -108,8 +138,17 @@ public class RpmsReportPublisher extends Recorder {
             return FormValidation.error("IDs must be unique. Are:" + uniqRepor.toString());
         }
         return FormValidation.ok();
-
     }
+
+
+    public FormValidation doValidateIds(@QueryParameter List<RpmsReportOneRecord> configurations) {
+        try {
+            return doCheckConfigurations(configurations);
+        } catch (Exception e) {
+            return FormValidation.error("Client error : " + e.getMessage());
+        }
+    }
+
 
     @Override
     public BuildStepDescriptor getDescriptor() {
@@ -130,6 +169,19 @@ public class RpmsReportPublisher extends Recorder {
         return buildstopast <= 0 ? 10 : buildstopast;
     }
 
+    public boolean isMovefailed() {
+        return movefailed;
+    }
+
+    public boolean isMoveunstable() {
+        return moveunstable;
+    }
+
+    public boolean isMoveempty() {
+        return moveempty;
+    }
+
+
     @DataBoundSetter
     public void setConfigurations(List<RpmsReportOneRecord> configurations) {
         this.configurations = configurations;
@@ -139,6 +191,21 @@ public class RpmsReportPublisher extends Recorder {
     @DataBoundSetter
     public void setBuildstopast(int buildstopast) {
         this.buildstopast = buildstopast;
+    }
+
+    @DataBoundSetter
+    public void setMoveunstable(boolean moveunstable) {
+        this.moveunstable = moveunstable;
+    }
+
+    @DataBoundSetter
+    public void setMovefailed(boolean movefailed) {
+        this.movefailed = movefailed;
+    }
+
+    @DataBoundSetter
+    public void setMoveempty(boolean moveempty) {
+        this.moveempty = moveempty;
     }
 
     @Extension
