@@ -65,4 +65,24 @@ public class RpmsReport {
         return build.getId();
     }
 
+    public int getBuildNumber() {
+        return build.getNumber();
+    }
+
+    public String getPreviousLink() {
+        return "../../" + (getBuildNumber() - 1) + "/rpms";
+    }
+
+    public String getPreviousLinkName() {
+        return " << " + (getBuildNumber() - 1) + " << ";
+    }
+
+    public String getNextLink() {
+        return "../../" + (getBuildNumber() + 1) + "/rpms";
+    }
+
+    public String getNextLinkName() {
+        return " >> " + (getBuildNumber() + 1) + " >> ";
+    }
+
 }

@@ -2,6 +2,9 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
     <l:layout title="${it.getDisplayName()} #${it.getRun()}">
         <l:main-panel>
+            <a href="${it.previousLink}/">${it.previousLinkName}</a>
+            ${it.buildNumber}
+            <a href="${it.nextLink}/">${it.nextLinkName}</a> <br/>
             <script type="text/javascript">
                 // &lt;![CDATA[
                 function diffPluginShowHideInlineOne(id) {
