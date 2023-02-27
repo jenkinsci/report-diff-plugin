@@ -17,10 +17,12 @@ Of course if yours monitoring is supposed to be multios, the content must be gen
 ## Job
 Most detaield view cnabe shown from build screen
 ![koji-jtreg-rpms](https://user-images.githubusercontent.com/2904395/43510354-a8f3e86c-9575-11e8-9318-c3516d65a876.png)
+
 In job build screen, simple, but a lot of saying  ```RPM Changes: X RPMs installed, Y RPMs removed``` is provided, where **RPM Changes** is link to following screen.
 Note, that Rpm Changes, Rpms installed and RPMs removed are **custom** strings which describe the changes you are monitoring.  See *advanced* section in job config of plugin. 
  
 ![run](https://user-images.githubusercontent.com/2904395/43015810-eb0c74fe-8c50-11e8-8420-ec3fb8df6037.png)
+
 You can nicely see what lines (packages in our case)  had changed.
 
 ## Project
@@ -50,6 +52,7 @@ Each of your charts can have separate title, and names of statuses (aka added li
 
 ## Changing build status
 You can set up plugin to change build status to unstable if there is change detected by diff.
+
 You can set up plugin to change build status to failed if there command/readign fails and/or nothing is read.
 
 
