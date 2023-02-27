@@ -3,10 +3,15 @@
 <div id="topLevelChartContainer">
 <script type="text/javascript">var diffChartClick = {};var diffBuildMap = {};</script>
 <j:forEach var="chart" items="${action.chartsData}">
+    <j:set var="chartData" value="${chart.chartData}" />
+<j:choose>
+<j:when test="${chartData.size() == 0}">
+    <div style="font-family: monospace; font-size:4">missing: ${chart.displayName}</div>
+</j:when>
+<j:otherwise>
     <h3 style="font-family: monospace">${chart.displayName}</h3>
     <div id="rpmsChartContainer-${chart.id}">
     <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
-    <j:set var="chartData" value="${chart.chartData}" />
     <script type="text/javascript">
         // &lt;![CDATA[
         var data = {
@@ -76,6 +81,8 @@
         };
         // ]]&gt;
     </script>
+</j:otherwise>
+</j:choose>
 </j:forEach>
 </div>
 </j:jelly>
