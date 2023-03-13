@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+       Plugin to show differences between files or command outputs as chart on project page or as string details on build page
+</div>
