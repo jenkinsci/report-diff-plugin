@@ -8,7 +8,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>report-diff</artifactId>
-    <version>2.1</version>
+    <version>2.2-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins list diff report publisher plugin</name>
     <properties>
