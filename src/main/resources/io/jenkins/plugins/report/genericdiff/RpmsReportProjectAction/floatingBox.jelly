@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
 <div id="topLevelChartContainer">
-<script type="text/javascript">var diffChartClick = {};var diffBuildMap = {};</script>
+<script type="text/javascript">var diffChartClick = {};</script>
 <j:forEach var="chart" items="${action.chartsData}">
     <j:set var="chartData" value="${chart.chartData}" />
 <j:choose>
@@ -25,12 +25,14 @@
                 datasets: [
                 {
                 label: "${chart.chartInstalled}",
-                        fillColor: "rgba(128,255,128,0.2)",
-                        strokeColor: "rgba(128,255,128,1)",
-                        pointColor: "rgba(128,255,128,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(128,255,128,1)",
+                fill: true,
+                backgroundColor: "rgba(128,255,128,0.2)",
+                borderColor: "rgba(128,255,128,1)",
+                pointBackgroundColor: "rgba(128,255,128,1)",
+                pointBorderColor: "#fff",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "rgba(128,255,128,1)",
+                pointRadius: 5,
                         data: [
         <j:forEach var="build" items="${chartData}" varStatus="status">
             ${build.installed}<j:if test="${!status.last}">,</j:if>
@@ -39,12 +41,14 @@
                 },
                 {
                 label: "${chart.chartRemoved}",
-                        fillColor: "rgba(255,128,128,0.2)",
-                        strokeColor: "rgba(255,128,128,1)",
-                        pointColor: "rgba(255,128,128,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(255,128,128,1)",
+               fill: true,
+              backgroundColor: "rgba(255,128,128,0.2)",
+              borderColor: "rgba(255,128,128,1)",
+                pointBackgroundColor: "rgba(255,128,128,1)",
+                pointBorderColor: "#fff",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "rgba(255,128,128,1)",
+                pointRadius: 5,
                         data: [
         <j:forEach var="removed" items="${chartData}" varStatus="status">
             ${build.removed}<j:if test="${!status.last}">,</j:if>
@@ -53,12 +57,14 @@
                 },
                 {
                 label: "${chart.chartTotal}",
-                        fillColor: "rgba(128,128,128,0.2)",
-                        strokeColor: "rgba(128,128,128,1)",
-                        pointColor: "rgba(128,128,128,1)",
-                        pointStrokeColor: "#fff",
-                        pointHighlightFill: "#fff",
-                        pointHighlightStroke: "rgba(128,128,128,1)",
+                fill: true,
+                backgroundColor: "rgba(128,128,128,0.2)",
+                borderColor: "rgba(128,128,128,1)",
+                pointBackgroundColor: "rgba(128,128,128,1)",
+                pointBorderColor: "#fff",
+                pointHoverBackgroundColor: "#fff",
+                pointHoverBorderColor: "rgba(128,128,128,1)",
+                pointRadius: 5,
                         data: [
         <j:forEach var="total" items="${chartData}" varStatus="status">
             ${build.total}<j:if test="${!status.last}">,</j:if>
@@ -74,19 +80,22 @@
               interaction: {
                 mode: 'index',
                 intersect: false
-              }
+              },
+               onClick: (e) => {
+                 var activePoints = diffChartClick["rpmsChart-${chart.id}"].getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+                 var point = activePoints[0]
+                 var datasetIndex = point.datasetIndex //labels are for all data together,  no need to look into exact dataset
+                 var index = point.index
+                 var result = diffChartClick["rpmsChart-${chart.id}"].config.data.labels[index]
+                 var buildId = result.substring(result.lastIndexOf(":") + 1)
+                 window.open("" + buildId + "/rpms#${chart.id}", "_blank");
+               }
             }
           };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart-${chart.id}").getContext("2d");
         diffChartClick["rpmsChart-${chart.id}"] = new Chart(ctx, allRpms);
-        <j:forEach var="build" items="${chartData}" varStatus="status">
-        diffBuildMap["${build.buildNameShortened}"] = "${build.buildNumber}";
-        </j:forEach>
-        document.getElementById("rpmsChartContainer-${chart.id}").onclick = function(evt){
-        var activePoints = diffChartClick["rpmsChart-${chart.id}"].getPointsAtEvent(evt);
-        window.open(diffBuildMap[activePoints[0].label] + "/rpms/#${chart.id}", "_blank");
-        };
+
         // ]]&gt;
     </script>
 </j:otherwise>
