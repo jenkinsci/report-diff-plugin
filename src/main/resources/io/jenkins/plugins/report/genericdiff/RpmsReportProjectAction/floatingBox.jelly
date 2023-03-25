@@ -14,8 +14,10 @@
     <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
     <script type="text/javascript">
         // &lt;![CDATA[
-        var data = {
-        labels: [
+        var allRpms = {
+          type: 'line',
+          data:   {
+          labels: [
         <j:forEach var="build" items="${chartData}" varStatus="status">
         "${build.buildNameShortened}"<j:if test="${!status.last}">,</j:if>
         </j:forEach>
@@ -64,14 +66,20 @@
                         ]
                 }
                 ]
-        };
-        var options = {
-        bezierCurve: false,
-                        multiTooltipTemplate: "&lt;%= datasetLabel + \": \" + value %&gt;"
-        };
+            },
+            options: {
+              plugins: {
+                legend: { display: false }
+              },
+              interaction: {
+                mode: 'index',
+                intersect: false
+              }
+            }
+          };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart-${chart.id}").getContext("2d");
-        diffChartClick["rpmsChart-${chart.id}"] = new Chart(ctx).Line(data, options);
+        diffChartClick["rpmsChart-${chart.id}"] = new Chart(ctx, allRpms);
         <j:forEach var="build" items="${chartData}" varStatus="status">
         diffBuildMap["${build.buildNameShortened}"] = "${build.buildNumber}";
         </j:forEach>
