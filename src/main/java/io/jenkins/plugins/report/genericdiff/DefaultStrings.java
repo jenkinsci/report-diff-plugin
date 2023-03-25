@@ -1,4 +1,4 @@
-package hudson.plugins.report.rpms;
+package io.jenkins.plugins.report.genericdiff;
 
 import java.util.HashMap;
 import java.util.Map;

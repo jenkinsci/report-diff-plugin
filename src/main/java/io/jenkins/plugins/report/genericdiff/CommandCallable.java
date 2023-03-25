@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package hudson.plugins.report.rpms;
+package io.jenkins.plugins.report.genericdiff;
 
 import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;

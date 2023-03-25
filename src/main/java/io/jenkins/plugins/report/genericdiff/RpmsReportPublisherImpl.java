@@ -1,9 +1,7 @@
-package hudson.plugins.report.rpms;
+package io.jenkins.plugins.report.genericdiff;
 
 import hudson.FilePath;
-import hudson.Launcher;
 import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 
 import java.io.File;
 import java.io.IOException;

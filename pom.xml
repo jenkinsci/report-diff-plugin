@@ -8,13 +8,12 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>report-diff</artifactId>
-    <version>2.2-SNAPSHOT</version>
+    <version>3.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Jenkins list diff report publisher plugin</name>
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <chartjs.version>4.2.1.4</chartjs.version>
         <jenkins.version>2.361.4</jenkins.version>
-        <java.level>8</java.level>
     </properties>
 
     <developers>
@@ -29,24 +28,15 @@
             <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>com.github.spotbugs</groupId>
-                <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.2.0</version>
-                <executions>
-                    <execution>
-                        <id>check</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <scm>
+        <connection>scm:git:https://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
@@ -62,14 +52,8 @@
     <dependencies>
         <dependency>
             <groupId>io.jenkins.plugins</groupId>
-            <artifactId>chartjs</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.sisu</groupId>
-            <artifactId>org.eclipse.sisu.plexus</artifactId>
-            <version>0.3.2</version>
-            <scope>test</scope>
+            <artifactId>chartjs-api</artifactId>
+            <version>${chartjs.version}</version>
         </dependency>
     </dependencies>
 </project>

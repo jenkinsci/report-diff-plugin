@@ -21,33 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package hudson.plugins.report.rpms;
+package io.jenkins.plugins.report.genericdiff;
 
-final public class Constants {
+public class OperationFailedException extends RuntimeException {
 
-
-    public static String getNEW(String id) {
-        return idToString(id) + "-new.txt";
-    }
-
-    public static String getREMOVED(String id) {
-        return idToString(id) + "-removed.txt";
-    }
-
-    public static String getALL(String id) {
-        return idToString(id) + "-all.txt";
-    }
-
-    public static String getCOMMAND_STDERR(String id) {
-        return idToString(id) + "-stderr.txt";
-    }
-
-    private static String idToString(String id) {
-        if (id == null || id.trim().isEmpty()) {
-            return "rpms";
-        } else {
-            return id;
-        }
+    public OperationFailedException(String message) {
+        super(message);
     }
 
 }

@@ -21,44 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package hudson.plugins.report.rpms;
+package io.jenkins.plugins.report.genericdiff;
 
-import hudson.Util;
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
-
-import java.util.Collection;
-import java.util.Collections;
-
+import hudson.model.Project;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
-import jenkins.tasks.SimpleBuildStep;
-import org.kohsuke.stapler.StaplerProxy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
+public class RpmsReportProjectAction implements Action {
 
-    private final AbstractBuild<?, ?> build;
+    private final Job<?, ?> job;
+    private RpmsReportPublisher publisher;
 
-    public RpmsReportAction(AbstractBuild<?, ?> build) {
-        this.build = build;
-    }
-
-    private RpmsReportPublisher getPublisher() {
-        DescribableList<Publisher, Descriptor<Publisher>> l = build.getProject().getPublishersList();
+    public RpmsReportProjectAction(Job<?, ?> job) {
+        this.job = job;
+        DescribableList<Publisher, Descriptor<Publisher>> l = ((Project) job).getPublishersList();
         for (Publisher p : l.toArray(new Publisher[0])) {
             if (p instanceof RpmsReportPublisher) {
-                return (RpmsReportPublisher) p;
+                publisher = (RpmsReportPublisher) p;
             }
         }
-        return null;
     }
 
     @Override
     public String getIconFileName() {
-        return "clipboard.png";
+        return null;
     }
 
     @Override
@@ -72,22 +65,13 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     }
 
 
-    @Override
-    public RpmsReport getTarget() {
-        return new RpmsReport(getPublisher(), build);
-    }
-
-
-
-    @Override
-    public Collection<? extends Action> getProjectActions() {
-        Job<?, ?> job = build.getParent();
-        if (/* getAction(Class) produces a StackOverflowError */!Util.filter(
-                        job.getActions(), RpmsReportProjectAction.class).isEmpty()) {
-            // JENKINS-26077: someone like XUnitPublisher already added one
-            return Collections.emptySet();
+    public List<RpmsReportProjectActionOneChart> getChartsData() {
+        List<RpmsReportProjectActionOneChart> list = new ArrayList<>();
+        for(RpmsReportOneRecord record: publisher.getConfigurations()) {
+            list.add(new RpmsReportProjectActionOneChart(record, publisher, job));
         }
-        return Collections.singleton(new RpmsReportProjectAction(job));
+        return list;
     }
+
 
 }
