@@ -7,6 +7,7 @@ Jenkins plugin to monittor comaprable content on system
 * [Settings](#settings)
 * [Multiple diffs](#multiple-diffs)
 * [Changing build status](#changing-build-status)
+* [Future work](#future-work)
 * [Limitations](#limitations)
     
 This plugin allows you to monitor any difference in output of file or of rnu of any command, where unit is an line.
