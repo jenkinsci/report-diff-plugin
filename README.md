@@ -56,7 +56,7 @@ You can set up plugin to change build status to unstable if there is change dete
 You can set up plugin to change build status to failed if there command/readign fails and/or nothing is read.
 
 ## Future work
-Plai diff and visualised dif based on https://github.com/java-diff-utils/java-diff-utils is on the way
+Plain diff and visualised diff based on https://github.com/java-diff-utils/java-diff-utils is on the way
 
 ## Limitations
 This plugin depends on https://github.com/judovana/jenkins-chartjs-plugin
