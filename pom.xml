@@ -10,7 +10,7 @@
     <artifactId>report-diff</artifactId>
     <version>3.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
-    <name>Jenkins list diff report publisher plugin</name>
+    <name>list diff file/command publisher plugin</name>
     <properties>
         <chartjs.version>4.2.1.4</chartjs.version>
         <jenkins.version>2.361.4</jenkins.version>
