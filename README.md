@@ -5,6 +5,7 @@ Jenkins plugin to monittor comaprable content on system
 * [Project state graph](#project)
     * [tooltip](#tooltip)
 * [Settings](#settings)
+    * [customizations](#customizations)
 * [Multiple diffs](#multiple-diffs)
 * [Changing build status](#changing-build-status)
 * [Future work](#future-work)
@@ -46,6 +47,9 @@ When you look to the sedttings:
 ![settings](https://user-images.githubusercontent.com/2904395/43122741-60e40448-8f22-11e8-84c2-de47d9c8e4be.png)
 
 You can see it is comand or file what you put here. It operates on workspace, so the file do not need to be archived (as is celar from nature of command xor file)
+
+###  customizations
+You can set up all the labels acording your taste, and thus give meaning to the diff you are presenting
 
 ## Multiple diffs
 You can havew sevral diffs, each comparing different command/file. According to this, several charts is show and several reports is navigable and collapsable in main report. Eah comaprsion have **ID** wich is mandatory to set, and is apointing the base line. Chnage of id == lost/change of baseline. 
