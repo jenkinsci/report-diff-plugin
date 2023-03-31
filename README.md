@@ -60,4 +60,4 @@ You can set up plugin to change build status to failed if there command/readign 
 Plain diff and visualised diff based on https://github.com/java-diff-utils/java-diff-utils is on the way
 
 ## Limitations
-This plugin depends on https://github.com/judovana/jenkins-chartjs-plugin
+This plugin depends on [chartjs-api](https://github.com/jenkinsci/chartjs-api-plugin) library plugin
