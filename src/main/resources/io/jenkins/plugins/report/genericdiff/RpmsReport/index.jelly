@@ -1,26 +1,11 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:test="/lib/test">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
     <l:layout title="${it.getDisplayName()} #${it.getRun()}">
         <l:main-panel>
             <a href="${it.previousLink}/">${it.previousLinkName}</a>
             ${it.buildNumber}
             <a href="${it.nextLink}/">${it.nextLinkName}</a> <br/>
-            <script type="text/javascript">
-                // &lt;![CDATA[
-                function diffPluginShowHideInlineOne(id) {
-                    diffPluginShowHideOne(id, 'inline')
-                }
-
-                function diffPluginShowHideBlockOne(id) {
-                    diffPluginShowHideOne(id, 'block')
-                }
-
-                function diffPluginShowHideOne(id, type) {
-                var el = document.getElementById(id);
-                if (el.style.display=='none') {el.style.display = type} else {el.style.display = 'none'};
-                }
-            // ]]&gt;
-            </script>
+            <st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReport.headerjs"/>
             <h1>${it.getDisplayName()} #${it.getRun()}:</h1>
             <j:forEach var="report" items="${it.index}">
                 <li>
