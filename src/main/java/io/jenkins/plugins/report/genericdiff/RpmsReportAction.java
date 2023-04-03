@@ -82,11 +82,6 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     @Override
     public Collection<? extends Action> getProjectActions() {
         Job<?, ?> job = build.getParent();
-        if (/* getAction(Class) produces a StackOverflowError */!Util.filter(
-                        job.getActions(), RpmsReportProjectAction.class).isEmpty()) {
-            // JENKINS-26077: someone like XUnitPublisher already added one
-            return Collections.emptySet();
-        }
         return Collections.singleton(new RpmsReportProjectAction(job));
     }
 
