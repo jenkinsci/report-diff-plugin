@@ -71,16 +71,15 @@
                 // &lt;![CDATA[
                 // ]]&gt;
             </p>
-            <script type="text/javascript">
-            // &lt;![CDATA[
+            <span id="report-publisher-id-data" style="visibility:hidden">
                 <j:forEach var="report" items="${it.index}">
-                    document.getElementById("${report.publisher.id}").onclick = function(evt){
-                      diffPluginShowHideBlockOne("collapsable-${report.publisher.id}")
-                    };
+                    ${report.publisher.id}
+                    &lt;![CDATA[
 
+                    ]]&gt;
                 </j:forEach>
-                // ]]&gt;
-            </script>
+            </span>
+            <st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReport.addclicks"/>
         </l:main-panel>
     </l:layout>
 </j:jelly>
