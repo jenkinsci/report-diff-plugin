@@ -125,8 +125,8 @@ public class RpmsReportPublisher extends Recorder {
             if (value == null || value.trim().isEmpty()) {
                 return FormValidation.error("ID must not be empty (and must be unique)");
             }
-            if (!value.matches("[a-zA-Z0-9]+")) {
-                return FormValidation.error("ID must be just letters a-zA-Z0-9 (and must be unique). Is " + value);
+            if (!value.matches("[" + RpmsReportOneRecord.ID_BASE + "]+")) {
+                return FormValidation.error("ID must be just letters " + RpmsReportOneRecord.ID_BASE+ " (and must be unique). Is " + value);
             }
             uniq.add(value);
             uniqRepor.add(value);

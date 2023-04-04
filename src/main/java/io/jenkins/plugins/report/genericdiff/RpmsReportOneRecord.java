@@ -26,6 +26,8 @@ package io.jenkins.plugins.report.genericdiff;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
+import java.util.UUID;
+
 
 public class RpmsReportOneRecord   {
 
@@ -45,11 +47,12 @@ public class RpmsReportOneRecord   {
     private String alllinesshort;
     private String lastProject = null;
 
+    public static final String ID_BASE="a-zA-Z0-9";
     @DataBoundConstructor
     public RpmsReportOneRecord(String command, String id, String maintitle, String nochanges, String updatedlines, String addedlines, String removedlines, String errortitle, String addedlineslong,
                                String removedlineslong, String alllineslong, String addedlinesshort, String removedlinesshort, String alllinesshort) {
         this.command = command;
-        this.id = id;
+        this.id = sanitizeId(id);
         this.maintitle = maintitle;
         this.nochanges = nochanges;
         this.updatedlines = updatedlines;
@@ -77,10 +80,17 @@ public class RpmsReportOneRecord   {
     }
 
     public String getId() {
-        return id;
+        return sanitizeId(id);
     }
 
-    public String getMaintitle() {
+    public static String sanitizeId(String id) {
+        if (id == null || id.trim().isEmpty()){
+            return "uuid"+ UUID.randomUUID().toString().split("-")[0].toUpperCase();
+        }
+        return id.replaceAll("[^" + RpmsReportOneRecord.ID_BASE + "]","");
+    }
+
+        public String getMaintitle() {
         return DefaultStrings.get(maintitle, DefaultStrings.MAIN_TITLE);
     }
 
