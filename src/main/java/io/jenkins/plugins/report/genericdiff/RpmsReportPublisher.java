@@ -43,10 +43,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.util.FormValidation;
+import jenkins.model.Jenkins;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 
 public class RpmsReportPublisher extends Recorder {
@@ -117,7 +119,11 @@ public class RpmsReportPublisher extends Recorder {
     /**
      * It seems that jenkins is unable to verify repeatble element. So we cal this manually by validate if
      */
+    @RequirePOST
     public FormValidation doCheckConfigurations(@QueryParameter List<RpmsReportOneRecord> configurations) {
+        if (!Jenkins.get().hasPermission(Jenkins.READ)) {
+            return FormValidation.ok();
+        }
         Set<String> uniq = new HashSet<>();
         List<String> uniqRepor = new ArrayList<>(configurations.size());
         for (RpmsReportOneRecord configuration : configurations) {
@@ -138,7 +144,11 @@ public class RpmsReportPublisher extends Recorder {
     }
 
 
+    @RequirePOST
     public FormValidation doValidateIds(@QueryParameter List<RpmsReportOneRecord> configurations) {
+        if (!Jenkins.get().hasPermission(Jenkins.READ)) {
+            return FormValidation.ok();
+        }
         try {
             return doCheckConfigurations(configurations);
         } catch (Exception e) {
