@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
 <div id="topLevelChartContainer">
-<script type="text/javascript">var diffChartClick = {};</script>
+<st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.declareDiffChartClickArray"/>
 <j:forEach var="chart" items="${action.chartsData}">
     <j:set var="chartData" value="${chart.chartData}" />
 <j:choose>
