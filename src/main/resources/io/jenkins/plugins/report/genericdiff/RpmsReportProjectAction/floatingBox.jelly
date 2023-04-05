@@ -1,50 +1,61 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
-<div id="topLevelChartContainer">
-<st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.declareDiffChartClickArray"/>
-<span id="rpmsChartContainer-ids" style="visibility:hidden">
-  <j:forEach var="chart" items="${action.chartsData}" varStatus="status">
-      ${chart.id}<j:if test="${!status.last}">,</j:if>
-  </j:forEach>
-</span>
-<j:forEach var="chart" items="${action.chartsData}">
-    <j:set var="chartData" value="${chart.chartData}" />
-<j:choose>
-<j:when test="${chartData.size() == 0}">
-    <div style="font-size:4"><code>missing: ${chart.displayName}</code></div>
-</j:when>
-<j:otherwise>
-    <h3><code>${chart.displayName}</code></h3>
-    <span id="rpmsChartContainer-labels-${chart.id}" style="visibility:hidden">
-        <j:forEach var="build" items="${chartData}" varStatus="status">
-            ${build.buildNameShortened}<j:if test="${!status.last}">,</j:if>
+    <div id="topLevelChartContainer">
+        <st:adjunct
+                includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.declareDiffChartClickArray"/>
+        <span id="rpmsChartContainer-ids" style="visibility:hidden">
+            <j:forEach var="chart" items="${action.chartsData}" varStatus="status">
+                ${chart.id}
+                <j:if test="${!status.last}">,</j:if>
+            </j:forEach>
+        </span>
+        <j:forEach var="chart" items="${action.chartsData}">
+            <j:set var="chartData" value="${chart.chartData}"/>
+            <j:choose>
+                <j:when test="${chartData.size() == 0}">
+                    <div style="font-size:4">
+                        <code>missing: ${chart.displayName}</code>
+                    </div>
+                </j:when>
+                <j:otherwise>
+                    <h3>
+                        <code>${chart.displayName}</code>
+                    </h3>
+                    <span id="rpmsChartContainer-labels-${chart.id}" style="visibility:hidden">
+                        <j:forEach var="build" items="${chartData}" varStatus="status">
+                            ${build.buildNameShortened}
+                            <j:if test="${!status.last}">,</j:if>
+                        </j:forEach>
+                    </span>
+                    <span id="rpmsChartContainer-installed-${chart.id}" style="visibility:hidden">
+                        <j:forEach var="build" items="${chartData}" varStatus="status">
+                            ${build.installed}
+                            <j:if test="${!status.last}">,</j:if>
+                        </j:forEach>
+                    </span>
+                    <span id="rpmsChartContainer-removed-${chart.id}" style="visibility:hidden">
+                        <j:forEach var="removed" items="${chartData}" varStatus="status">
+                            ${build.removed}
+                            <j:if test="${!status.last}">,</j:if>
+                        </j:forEach>
+                    </span>
+                    <span id="rpmsChartContainer-total-${chart.id}" style="visibility:hidden">
+                        <j:forEach var="total" items="${chartData}" varStatus="status">
+                            ${build.total}
+                            <j:if test="${!status.last}">,</j:if>
+                        </j:forEach>
+                    </span>
+                    <span id="rpmsChartContainer-titles-${chart.id}" style="visibility:hidden">
+                        ${chart.chartInstalled},
+                        ${chart.chartRemoved},
+                        ${chart.chartTotal}
+                    </span>
+                    <div id="rpmsChartContainer-${chart.id}">
+                        <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas>
+                    </div>
+                </j:otherwise>
+            </j:choose>
         </j:forEach>
-    </span>
-    <span id="rpmsChartContainer-installed-${chart.id}" style="visibility:hidden">
-        <j:forEach var="build" items="${chartData}" varStatus="status">
-            ${build.installed}<j:if test="${!status.last}">,</j:if>
-        </j:forEach>
-    </span>
-    <span id="rpmsChartContainer-removed-${chart.id}" style="visibility:hidden">
-        <j:forEach var="removed" items="${chartData}" varStatus="status">
-            ${build.removed}<j:if test="${!status.last}">,</j:if>
-        </j:forEach>
-    </span>
-    <span id="rpmsChartContainer-total-${chart.id}" style="visibility:hidden">
-        <j:forEach var="total" items="${chartData}" varStatus="status">
-            ${build.total}<j:if test="${!status.last}">,</j:if>
-        </j:forEach>
-    </span>
-    <span id="rpmsChartContainer-titles-${chart.id}" style="visibility:hidden">
-        ${chart.chartInstalled},
-        ${chart.chartRemoved},
-        ${chart.chartTotal}
-    </span>
-    <div id="rpmsChartContainer-${chart.id}">
-    <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
-</j:otherwise>
-</j:choose>
-</j:forEach>
-<st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.chartLogic"/>
-</div>
+        <st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.chartLogic"/>
+    </div>
 </j:jelly>
