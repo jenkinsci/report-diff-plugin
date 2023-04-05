@@ -82,13 +82,15 @@
                 intersect: false
               },
                onClick: (e) => {
-                 var activePoints = diffChartClick["rpmsChart-${chart.id}"].getElementsAtEventForMode(e, 'index', { intersect: false }, true);
+                 var lid = e.chart.canvas.id
+                 var jid = lid.replace("rpmsChart-", "")
+                 var activePoints = diffChartClick[lid].getElementsAtEventForMode(e, 'index', { intersect: false }, true);
                  var point = activePoints[0]
                  var datasetIndex = point.datasetIndex //labels are for all data together,  no need to look into exact dataset
                  var index = point.index
-                 var result = diffChartClick["rpmsChart-${chart.id}"].config.data.labels[index]
+                 var result = diffChartClick[lid].config.data.labels[index]
                  var buildId = result.substring(result.lastIndexOf(":") + 1)
-                 window.open("" + buildId + "/rpms#${chart.id}", "_blank");
+                 window.open("" + buildId + "/rpms#"+jid, "_blank");
                }
             }
           };
