@@ -1,7 +1,12 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
 <div id="topLevelChartContainer">
 <st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.declareDiffChartClickArray"/>
+<span id="rpmsChartContainer-ids" style="visibility:hidden">
+  <j:forEach var="chart" items="${action.chartsData}" varStatus="status">
+      ${chart.id}<j:if test="${!status.last}">,</j:if>
+  </j:forEach>
+</span>
 <j:forEach var="chart" items="${action.chartsData}">
     <j:set var="chartData" value="${chart.chartData}" />
 <j:choose>
@@ -10,98 +15,36 @@
 </j:when>
 <j:otherwise>
     <h3><code>${chart.displayName}</code></h3>
-    <div id="rpmsChartContainer-${chart.id}">
-    <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
-    <script type="text/javascript">
-        // &lt;![CDATA[
-        var allRpms = {
-          type: 'line',
-          data:   {
-          labels: [
+    <span id="rpmsChartContainer-labels-${chart.id}" style="visibility:hidden">
         <j:forEach var="build" items="${chartData}" varStatus="status">
-        "${build.buildNameShortened}"<j:if test="${!status.last}">,</j:if>
+            ${build.buildNameShortened}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
-        ],
-                datasets: [
-                {
-                label: "${chart.chartInstalled}",
-                fill: true,
-                backgroundColor: "rgba(128,255,128,0.2)",
-                borderColor: "rgba(128,255,128,1)",
-                pointBackgroundColor: "rgba(128,255,128,1)",
-                pointBorderColor: "#fff",
-                pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: "rgba(128,255,128,1)",
-                pointRadius: 5,
-                        data: [
+    </span>
+    <span id="rpmsChartContainer-installed-${chart.id}" style="visibility:hidden">
         <j:forEach var="build" items="${chartData}" varStatus="status">
             ${build.installed}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
-                        ]
-                },
-                {
-                label: "${chart.chartRemoved}",
-               fill: true,
-              backgroundColor: "rgba(255,128,128,0.2)",
-              borderColor: "rgba(255,128,128,1)",
-                pointBackgroundColor: "rgba(255,128,128,1)",
-                pointBorderColor: "#fff",
-                pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: "rgba(255,128,128,1)",
-                pointRadius: 5,
-                        data: [
+    </span>
+    <span id="rpmsChartContainer-removed-${chart.id}" style="visibility:hidden">
         <j:forEach var="removed" items="${chartData}" varStatus="status">
             ${build.removed}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
-                        ]
-                },
-                {
-                label: "${chart.chartTotal}",
-                fill: true,
-                backgroundColor: "rgba(128,128,128,0.2)",
-                borderColor: "rgba(128,128,128,1)",
-                pointBackgroundColor: "rgba(128,128,128,1)",
-                pointBorderColor: "#fff",
-                pointHoverBackgroundColor: "#fff",
-                pointHoverBorderColor: "rgba(128,128,128,1)",
-                pointRadius: 5,
-                        data: [
+    </span>
+    <span id="rpmsChartContainer-total-${chart.id}" style="visibility:hidden">
         <j:forEach var="total" items="${chartData}" varStatus="status">
             ${build.total}<j:if test="${!status.last}">,</j:if>
         </j:forEach>
-                        ]
-                }
-                ]
-            },
-            options: {
-              plugins: {
-                legend: { display: false }
-              },
-              interaction: {
-                mode: 'index',
-                intersect: false
-              },
-               onClick: (e) => {
-                 var lid = e.chart.canvas.id
-                 var jid = lid.replace("rpmsChart-", "")
-                 var activePoints = diffChartClick[lid].getElementsAtEventForMode(e, 'index', { intersect: false }, true);
-                 var point = activePoints[0]
-                 var datasetIndex = point.datasetIndex //labels are for all data together,  no need to look into exact dataset
-                 var index = point.index
-                 var result = diffChartClick[lid].config.data.labels[index]
-                 var buildId = result.substring(result.lastIndexOf(":") + 1)
-                 window.open("" + buildId + "/rpms#"+jid, "_blank");
-               }
-            }
-          };
-        // Get the context of the canvas element we want to select
-        var ctx = document.getElementById("rpmsChart-${chart.id}").getContext("2d");
-        diffChartClick["rpmsChart-${chart.id}"] = new Chart(ctx, allRpms);
-
-        // ]]&gt;
-    </script>
+    </span>
+    <span id="rpmsChartContainer-titles-${chart.id}" style="visibility:hidden">
+        ${chart.chartInstalled},
+        ${chart.chartRemoved},
+        ${chart.chartTotal}
+    </span>
+    <div id="rpmsChartContainer-${chart.id}">
+    <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
 </j:otherwise>
 </j:choose>
 </j:forEach>
+<st:adjunct includes="io.jenkins.plugins.report.genericdiff.RpmsReportProjectAction.chartLogic"/>
 </div>
 </j:jelly>
