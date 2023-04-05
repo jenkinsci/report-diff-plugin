@@ -25,6 +25,7 @@ package io.jenkins.plugins.report.genericdiff;
 
 import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
+import jenkins.MasterToSlaveFileCallable;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,11 +37,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jenkinsci.remoting.RoleChecker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommandCallable implements FileCallable<List<String>> {
+public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandCallable.class);
     private final String command;
@@ -121,10 +121,6 @@ public class CommandCallable implements FileCallable<List<String>> {
             }
         }
         return sb.toString();
-    }
-
-    @Override
-    public void checkRoles(RoleChecker checker) throws SecurityException {
     }
 
     private static class OutputReader implements Runnable {
