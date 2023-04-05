@@ -6,10 +6,10 @@
     <j:set var="chartData" value="${chart.chartData}" />
 <j:choose>
 <j:when test="${chartData.size() == 0}">
-    <div style="font-family: monospace; font-size:4">missing: ${chart.displayName}</div>
+    <div style="font-size:4"><code>missing: ${chart.displayName}</code></div>
 </j:when>
 <j:otherwise>
-    <h3 style="font-family: monospace">${chart.displayName}</h3>
+    <h3><code>${chart.displayName}</code></h3>
     <div id="rpmsChartContainer-${chart.id}">
     <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas></div>
     <script type="text/javascript">

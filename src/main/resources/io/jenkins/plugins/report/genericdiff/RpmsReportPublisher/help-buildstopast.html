@@ -1,0 +1,9 @@
+<div>
+    This is help for <b>command</b> or <b>file</b> iniside <i>Individual commands/files to compare</i> after you push the "add" button<br/>
+    Sorry, I do not know how to put help into repeatable element. And command/file is heart beat which should have had help.<br/>
+    The list of commands that outputs list of Strings for compare. For example:<br/>
+    <code> rpm -qa or </code> or <code> env </code><br/>
+    Or just <code>files</code> to be read, if exists (otherwise interpreted as command)<br/>
+    command is run/file located in workspace. Is processed, and stored where it should be - jenkins_home/jobs/jobname/buildid/rpms-{all,new,removed,stderr}.txt<br/>
+    Warning, empty output from command do is not opening output stream, so it is considered as null, not epty (unlike empty file)<br/>
+</div>

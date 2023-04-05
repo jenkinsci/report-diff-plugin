@@ -24,13 +24,13 @@
                 <a href="#${report.publisher.id}-err">${report.errorHeader}</a>
                 <j:if test="${report.stderr != null}">
                     <h3 id="${report.publisher.id}-err">${report.errorHeader}</h3>
-                    <div style="font-family: monospace">
+                    <code>
                         ${report.stderr}
-                    </div>
+                    </code>
                 </j:if>
                 <j:if test="${report.newRpms != null}">
                     <h3 id="${report.publisher.id}-add">${report.addedHeader} (${report.newRpms.size()})</h3>
-                    <div style="font-family: monospace">
+                    <code>
                         <ul>
                             <j:forEach var="rpm" items="${report.newRpms}">
                                 <li>
@@ -38,11 +38,11 @@
                                 </li>
                             </j:forEach>
                         </ul>
-                    </div>
+                    </code>
                 </j:if>
                 <j:if test="${report.removedRpms != null}">
                     <h3 id="${report.publisher.id}-rem">${report.removedHeader} (${report.removedRpms.size()})</h3>
-                    <div style="font-family: monospace">
+                    <code>
                         <ul>
                             <j:forEach var="rpm" items="${report.removedRpms}">
                                 <li>
@@ -50,11 +50,11 @@
                                 </li>
                             </j:forEach>
                         </ul>
-                    </div>
+                    </code>
                 </j:if>
                 <j:if test="${report.allRpms != null}">
                     <h3 id="${report.publisher.id}-all">${report.allHeader} (${report.allRpms.size()})</h3>
-                    <div style="font-family: monospace">
+                    <code>
                         <ul>
                             <j:forEach var="rpm" items="${report.allRpms}">
                                 <li>
@@ -62,7 +62,7 @@
                                 </li>
                             </j:forEach>
                         </ul>
-                    </div>
+                    </code>
                 </j:if>
                 </span>
             </j:forEach>
