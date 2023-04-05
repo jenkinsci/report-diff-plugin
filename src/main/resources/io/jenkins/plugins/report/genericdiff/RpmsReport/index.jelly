@@ -18,9 +18,9 @@
                 <hr/>
                 <h2 id="${report.publisher.id}">${report.publisher.maintitle}(${report.publisher.command}):</h2>
                 <span id="collapsable-${report.publisher.id}">
-                <a href="#${report.publisher.id}-add">${report.addedHeader}</a>
-                <a href="#${report.publisher.id}-rem">${report.removedHeader}</a>
-                <a href="#${report.publisher.id}-all">${report.allHeader}</a>
+                <a href="#${report.publisher.id}-add">${report.addedHeader}<st:nbsp/>${report.newRpms.size()}</a><st:nbsp/>|<st:nbsp/>
+                <a href="#${report.publisher.id}-rem">${report.removedHeader}<st:nbsp/>${report.removedRpms.size()}</a><st:nbsp/>|<st:nbsp/>
+                <a href="#${report.publisher.id}-all">${report.allHeader}<st:nbsp/>${report.allRpms.size()}</a><st:nbsp/>|<st:nbsp/>
                 <a href="#${report.publisher.id}-err">${report.errorHeader}</a>
                 <j:if test="${report.stderr != null}">
                     <h3 id="${report.publisher.id}-err">${report.errorHeader}</h3>
