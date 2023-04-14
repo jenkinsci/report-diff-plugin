@@ -1,7 +1,4 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
-    <script type="text/javascript">
-        // &lt;![CDATA[
+        //<![CDATA[
         function diffPluginShowHideInlineOne(id) {
         diffPluginShowHideOne(id, 'inline')
         }
@@ -14,6 +11,4 @@
         var el = document.getElementById(id);
         if (el.style.display=='none') {el.style.display = type} else {el.style.display = 'none'};
         }
-        // ]]&gt;
-    </script>
-</j:jelly>
+        // ]]>

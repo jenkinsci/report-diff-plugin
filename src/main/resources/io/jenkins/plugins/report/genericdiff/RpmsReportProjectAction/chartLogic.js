@@ -1,9 +1,6 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
-    <script type="text/javascript">
-        // &lt;![CDATA[
+        // <![CDATA[
 var rpmcharts_ids = document.getElementById('rpmsChartContainer-ids').textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-for (let i = 0; i &lt; rpmcharts_ids.length; i++) {
+for (let i = 0; i < rpmcharts_ids.length; i++) {
         var id = rpmcharts_ids[i]
         var data_labels = document.getElementById('rpmsChartContainer-labels-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
         var data_installed = document.getElementById('rpmsChartContainer-installed-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
@@ -78,6 +75,4 @@ for (let i = 0; i &lt; rpmcharts_ids.length; i++) {
         var ctx = document.getElementById("rpmsChart-"+id).getContext("2d");
         diffChartClick["rpmsChart-"+id] = new Chart(ctx, allRpms);
 }
-        // ]]&gt;
-    </script>
-</j:jelly>
+        // ]]>

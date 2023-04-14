@@ -1,9 +1,6 @@
-<?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
-    <script type="text/javascript">
-        // &lt;![CDATA[
+        // <![CDATA[
         var data = document.getElementById('report-publisher-id-data').textContent.trim().split(/\s+/)
-        for (let i = 0; i &lt; data.length; i++) {
+        for (let i = 0; i < data.length; i++) {
           var lidd = data[i];
           if ((lidd?.trim()?.length || 0) > 0) {
             document.getElementById(lidd).onclick = function(evt){
@@ -11,6 +8,4 @@
             };
           }
         }
-        // ]]&gt;
-    </script>
-</j:jelly>
+        // ]]>
