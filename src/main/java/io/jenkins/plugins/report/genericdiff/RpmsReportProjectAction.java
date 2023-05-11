@@ -61,7 +61,7 @@ public class RpmsReportProjectAction implements Action {
 
     @Override
     public String getUrlName() {
-        return "rpms";
+        return DefaultStrings.RPMS_URL;
     }
 
 

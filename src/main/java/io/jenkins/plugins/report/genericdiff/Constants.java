@@ -25,6 +25,7 @@ package io.jenkins.plugins.report.genericdiff;
 
 final public class Constants {
 
+    private static final String LEGACY_ID =  "rpms";
 
     public static String getNEW(String id) {
         return idToString(id) + "-new.txt";
@@ -44,7 +45,7 @@ final public class Constants {
 
     private static String idToString(String id) {
         if (id == null || id.trim().isEmpty()) {
-            return "rpms";
+            return LEGACY_ID;
         } else {
             return id;
         }

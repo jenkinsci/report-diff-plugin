@@ -23,7 +23,6 @@
  */
 package io.jenkins.plugins.report.genericdiff;
 
-import hudson.Util;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Descriptor;
@@ -68,7 +67,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getUrlName() {
-        return "rpms";
+        return DefaultStrings.RPMS_URL;
     }
 
 
