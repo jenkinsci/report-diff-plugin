@@ -23,25 +23,25 @@
  */
 package io.jenkins.plugins.report.genericdiff;
 
-import hudson.model.AbstractBuild;
-import hudson.model.Action;
-import hudson.model.Descriptor;
-import hudson.model.Job;
+import org.kohsuke.stapler.StaplerProxy;
 
 import java.util.Collection;
 import java.util.Collections;
 
+import hudson.model.AbstractBuild;
+import hudson.model.Action;
+import hudson.model.Descriptor;
+import hudson.model.Job;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
 import jenkins.tasks.SimpleBuildStep;
-import org.kohsuke.stapler.StaplerProxy;
 
 
-public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
+public class DiffReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
 
     private final AbstractBuild<?, ?> build;
 
-    public RpmsReportAction(AbstractBuild<?, ?> build) {
+    public DiffReportAction(AbstractBuild<?, ?> build) {
         this.build = build;
     }
 
@@ -62,23 +62,18 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE_REPORT;
+        return DefaultStrings.DIFF_TITLE_REPORT;
     }
 
     @Override
     public String getUrlName() {
-        return DefaultStrings.RPMS_URL;
-    }
-
-
-    public String getDiffUrlName() {
         return DefaultStrings.PATCH_URL;
     }
 
 
     @Override
-    public RpmsReport getTarget() {
-        return new RpmsReport(getPublisher(), build);
+    public DiffReport getTarget() {
+        return new DiffReport(getPublisher(), build);
     }
 
 
@@ -86,7 +81,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     @Override
     public Collection<? extends Action> getProjectActions() {
         Job<?, ?> job = build.getParent();
-        return Collections.singleton(new RpmsReportProjectAction(job));
+        return Collections.singleton(new DiffReportProjectAction(job));
     }
 
 }

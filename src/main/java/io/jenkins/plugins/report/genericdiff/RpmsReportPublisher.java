@@ -88,7 +88,10 @@ public class RpmsReportPublisher extends Recorder {
                     emptyItems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
                 }
             }
+
         }
+        DiffReportAction diff = new DiffReportAction(build);
+        build.addAction(diff);
         RpmsReportAction action = new RpmsReportAction(build);
         build.addAction(action);
         FormValidation fv = doCheckConfigurations(configurations);

@@ -24,41 +24,32 @@
 package io.jenkins.plugins.report.genericdiff;
 
 
-import hudson.model.AbstractBuild;
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.Patch;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
-public class RpmsReport {
+import hudson.model.AbstractBuild;
 
-    private final RpmsReportPublisher publisher;
-    private final List<RpmsReportActionOneSummary> summary;
-    private final List<RpmsReportSingle> index;
+public class DiffReport {
+
     private final AbstractBuild<?, ?> build;
+    private final RpmsReport data;
 
-    public RpmsReport(RpmsReportPublisher publisher, AbstractBuild<?, ?> build) {
-        this.publisher = publisher;
+    public DiffReport(RpmsReportPublisher publisher, AbstractBuild<?, ?> build) {
         this.build = build;
-        summary = new ArrayList<>();
-        index = new ArrayList<>();
-        for(RpmsReportOneRecord record: this.publisher.getConfigurations()) {
-            RpmsReportActionOneSummary summary1 = new RpmsReportActionOneSummary(build, record);
-            RpmsReportSingle index1 = new RpmsReportSingle(record, summary1.getStderr(), summary1.getNewRpms(), summary1.getRemovedRpms(), summary1.getAllRpms());
-            summary.add(summary1);
-            index.add(index1);
+        data = new RpmsReport(publisher, build);
+        List<RpmsReportSingle> files = data.getIndex();
+        for(RpmsReportSingle report: files) {
+            Patch<String> diff = DiffUtils.diff(l0, l1);
+            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo.size, l1.size));
         }
     }
 
-    public List<RpmsReportActionOneSummary> getSummary() {
-        return summary;
-    }
-
-    public List<RpmsReportSingle> getIndex() {
-        return index;
-    }
-
     public String getDisplayName() {
-        return DefaultStrings.MAIN_TITLE_REPORT;
+        return DefaultStrings.DIFF_TITLE_REPORT;
     }
 
     public String getRun() {
@@ -70,7 +61,7 @@ public class RpmsReport {
     }
 
     public String getPreviousLink() {
-        return "../../" + (getBuildNumber() - 1) + "/"+DefaultStrings.RPMS_URL;
+        return "../../" + (getBuildNumber() - 1) + "/"+DefaultStrings.PATCH_URL;
     }
 
     public String getPreviousLinkName() {
@@ -78,7 +69,7 @@ public class RpmsReport {
     }
 
     public String getNextLink() {
-        return "../../" + (getBuildNumber() + 1) + "/"+DefaultStrings.RPMS_URL;
+        return "../../" + (getBuildNumber() + 1) + "/"+DefaultStrings.PATCH_URL;
     }
 
     public String getNextLinkName() {
