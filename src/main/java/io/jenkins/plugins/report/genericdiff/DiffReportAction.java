@@ -52,7 +52,8 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
 
     private RpmsReportPublisher getRpmsReport(AbstractBuild<?, ?> build) {
         final RpmsReportPublisher data;
-        Optional<RpmsReportPublisher> publisher = (build.getProject().getPublishersList().stream().filter(p -> p instanceof RpmsReportPublisher).map(a -> (RpmsReportPublisher) a).findFirst());
+        Optional<RpmsReportPublisher> publisher =
+                (build.getProject().getPublishersList().stream().filter(p -> p instanceof RpmsReportPublisher).map(a -> (RpmsReportPublisher) a).findFirst());
         if (publisher.isPresent()) {
             data = publisher.get();
         } else {
@@ -105,20 +106,9 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             } else {
                 RpmsReport dataFrom = new RpmsReport(pFrom, bFrom);
                 RpmsReport dataTo = new RpmsReport(pTo, bTo);
-                if (dataFrom == null && dataTo == null) {
-                    res.setStatus(404);
-                    out.print("builds " + from + " nor " + to + " have valid data");
-                } else if (dataFrom == null) {
-                    res.setStatus(404);
-                    out.print("build " + from + " do not have have valid data");
-                } else if (dataTo == null) {
-                    res.setStatus(404);
-                    out.print("build " + to + " do not have have valid data");
-                } else {
-                    List<String> resultLines = comapre(dataFrom, dataTo);
-                    for (String resultLine : resultLines) {
-                        out.println(resultLine);
-                    }
+                List<String> resultLines = comapre(dataFrom, dataTo);
+                for (String resultLine : resultLines) {
+                    out.println(resultLine);
                 }
             }
         }
@@ -131,20 +121,22 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         //first gather all ids, then iterate through both sets.
         //if some of them do not have that id, then all + or -...
         for (RpmsReportSingle report : files1) {
-            if (report.getAllRpms()!=null) {
+            if (report.getAllRpms() != null) {
                 resultLines.add(report.getPublisher().getId());
                 resultLines.addAll(report.getAllRpms());
 //            Patch<String> diff = DiffUtils.diff(l0, l1);
-//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo.size, l1.size));
+//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo
+//            .size, l1.size));
             }
         }
         List<RpmsReportSingle> files2 = data2.getIndex();
         for (RpmsReportSingle report : files2) {
-            if (report.getAllRpms()!=null) {
+            if (report.getAllRpms() != null) {
                 resultLines.add(report.getPublisher().getId());
                 resultLines.addAll(report.getAllRpms());
 //            Patch<String> diff = DiffUtils.diff(l0, l1);
-//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo.size, l1.size));
+//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo
+//            .size, l1.size));
             }
         }
         return resultLines;
@@ -167,11 +159,24 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
     }
 
     public String getThisBuild() {
-        return build.getId();
+        if (build == null) {
+            return "0";
+        } else {
+            return build.getId();
+        }
     }
 
     public String getPreviousBuild() {
-        return build.getPreviousCompletedBuild().getId();
+        if (build == null) {
+            return "0";
+        } else {
+            AbstractBuild<?, ?> previouSbuild = build.getPreviousCompletedBuild();
+            if (previouSbuild == null) {
+                return "0";
+            } else {
+                return previouSbuild.getId();
+            }
+        }
     }
 
 
