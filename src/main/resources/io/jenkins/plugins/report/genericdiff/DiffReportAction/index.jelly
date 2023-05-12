@@ -10,6 +10,13 @@
                 <f:entry title="...to comapre with build:" >
                     <f:number name="to" min="0" value="${it.getPreviousBuild()}"></f:number>
                 </f:entry>
+                <f:entry title="interested comaprisons" >
+                    <f:select>
+                        <f:option selected="true" value="id1">id1</f:option>
+                        <f:option selected="true" value="id2">id2</f:option>
+                        <f:option selected="true" value="id3">id3</f:option>
+                    </f:select>
+                </f:entry>
                 <f:submit value="Compute" name="Compute"></f:submit>
             </f:form>
         </l:main-panel>
