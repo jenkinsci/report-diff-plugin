@@ -29,11 +29,10 @@ import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.WebMethod;
 import org.kohsuke.stapler.verb.GET;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -67,12 +66,16 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
     }
 
     @GET
-    @WebMethod(name = "dynamic-diff")
+    @WebMethod(name = DefaultStrings.DIFF_COMPUTED_URL)
     public void doSearchOffset(StaplerRequest req, StaplerResponse res) throws IOException {
         res.setContentType("text/plain");
         res.setCharacterEncoding("UTF-8");
         PrintWriter out = res.getWriter();
 
+        String[] interesting = req.getParameterValues("ids");
+        if (interesting == null) {
+            interesting = new String[]{".*"};
+        }
         try {
             long from = Long.parseLong(req.getParameter("from"));
             long to = Long.parseLong(req.getParameter("to"));
@@ -106,7 +109,7 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             } else {
                 RpmsReport dataFrom = new RpmsReport(pFrom, bFrom);
                 RpmsReport dataTo = new RpmsReport(pTo, bTo);
-                List<String> resultLines = comapre(dataFrom, dataTo);
+                List<String> resultLines = comapre(dataFrom, dataTo, interesting);
                 for (String resultLine : resultLines) {
                     out.println(resultLine);
                 }
@@ -115,11 +118,12 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         out.flush();
     }
 
-    private List<String> comapre(RpmsReport data1, RpmsReport data2) {
+    private List<String> comapre(RpmsReport data1, RpmsReport data2, String[] interesting) {
         List<String> resultLines = new ArrayList<>();
         List<RpmsReportSingle> files1 = data1.getIndex();
         //first gather all ids, then iterate through both sets.
         //if some of them do not have that id, then all + or -...
+        // and also if it mathes any of the interesting regexes...
         for (RpmsReportSingle report : files1) {
             if (report.getAllRpms() != null) {
                 resultLines.add(report.getPublisher().getId());
@@ -170,13 +174,28 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         if (build == null) {
             return "0";
         } else {
-            AbstractBuild<?, ?> previouSbuild = build.getPreviousCompletedBuild();
+            AbstractBuild<?, ?> previouSbuild = build.getPreviousNotFailedBuild();
             if (previouSbuild == null) {
                 return "0";
             } else {
                 return previouSbuild.getId();
             }
         }
+    }
+
+    public List<String> getDiffIds() {
+        if (build == null) {
+            return Arrays.asList(".*");
+        }
+        RpmsReportPublisher pFrom = getRpmsReport(build);
+        if (pFrom == null) {
+            return Arrays.asList(".*");
+        }
+        List<String> r = new ArrayList<>();
+        for (RpmsReportOneRecord on : pFrom.getConfigurations()) {
+            r.add(on.getId());
+        }
+        return r;
     }
 
 

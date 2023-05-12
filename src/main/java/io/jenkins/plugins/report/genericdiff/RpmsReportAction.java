@@ -72,7 +72,17 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
 
     public String getDiffUrlName() {
-        return DefaultStrings.PATCH_URL;
+        String thisId = "0";
+        String prevId = "0";
+        if (build != null) {
+            thisId = build.getId();
+            AbstractBuild<?, ?> bb = build.getPreviousNotFailedBuild();
+            if (bb != null) {
+                prevId = bb.getId();
+            }
+        }
+        return DefaultStrings.PATCH_URL + "/" + DefaultStrings.DIFF_COMPUTED_URL +
+                "?from=" + thisId + "&to=" + prevId + "&ids=.*";
     }
 
 
@@ -80,7 +90,6 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     public RpmsReport getTarget() {
         return new RpmsReport(getPublisher(), build);
     }
-
 
 
     @Override
