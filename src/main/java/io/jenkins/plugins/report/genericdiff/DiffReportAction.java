@@ -50,11 +50,11 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         this.build = build;
     }
 
-    private RpmsReport getRpmsReport(AbstractBuild<?, ?> build) {
-        final RpmsReport data;
+    private RpmsReportPublisher getRpmsReport(AbstractBuild<?, ?> build) {
+        final RpmsReportPublisher data;
         Optional<RpmsReportPublisher> publisher = (build.getProject().getPublishersList().stream().filter(p -> p instanceof RpmsReportPublisher).map(a -> (RpmsReportPublisher) a).findFirst());
         if (publisher.isPresent()) {
-            data = new RpmsReport(publisher.get(), build);
+            data = publisher.get();
         } else {
             data = null;
         }
@@ -89,24 +89,36 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             res.setStatus(404);
             out.print("Invalid parameters");
         } else {
-            AbstractBuild<?, ?> b1 = this.build.getProject().getBuild(from + "");
-            AbstractBuild<?, ?> b2 = this.build.getProject().getBuild(to + "");
-            RpmsReport data1 = getRpmsReport(b1);
-            RpmsReport data2 = getRpmsReport(b2);
-            if (data1 == null && data2 == null) {
+            AbstractBuild<?, ?> bFrom = this.build.getProject().getBuild(from + "");
+            AbstractBuild<?, ?> bTo = this.build.getProject().getBuild(to + "");
+            RpmsReportPublisher pFrom = getRpmsReport(bFrom);
+            RpmsReportPublisher pTo = getRpmsReport(bTo);
+            if (pFrom == null && pTo == null) {
                 res.setStatus(404);
-                out.print("builds " + from + " nor " + to + " have valid data");
-            } else if (data1 == null) {
+                out.print("builds " + from + " nor " + to + " have RpmsReportPublisher");
+            } else if (pFrom == null) {
                 res.setStatus(404);
-                out.print("build " + from + " do not have have valid data");
-            } else if (data2 == null) {
+                out.print("build " + from + " do not have have RpmsReportPublisher");
+            } else if (pTo == null) {
                 res.setStatus(404);
-                out.print("build " + to + " do not have have valid data");
+                out.print("build " + to + " do not have have RpmsReportPublisher");
             } else {
-                List<String> resultLines = comapre(data1, data2);
-                resultLines.add("jupiii!");
-                for (String resultLine : resultLines) {
-                    out.println(resultLine);
+                RpmsReport dataFrom = new RpmsReport(pFrom, bFrom);
+                RpmsReport dataTo = new RpmsReport(pTo, bTo);
+                if (dataFrom == null && dataTo == null) {
+                    res.setStatus(404);
+                    out.print("builds " + from + " nor " + to + " have valid data");
+                } else if (dataFrom == null) {
+                    res.setStatus(404);
+                    out.print("build " + from + " do not have have valid data");
+                } else if (dataTo == null) {
+                    res.setStatus(404);
+                    out.print("build " + to + " do not have have valid data");
+                } else {
+                    List<String> resultLines = comapre(dataFrom, dataTo);
+                    for (String resultLine : resultLines) {
+                        out.println(resultLine);
+                    }
                 }
             }
         }
@@ -116,20 +128,24 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
     private List<String> comapre(RpmsReport data1, RpmsReport data2) {
         List<String> resultLines = new ArrayList<>();
         List<RpmsReportSingle> files1 = data1.getIndex();
+        //first gather all ids, then iterate through both sets.
+        //if some of them do not have that id, then all + or -...
         for (RpmsReportSingle report : files1) {
             if (report.getAllRpms()!=null) {
+                resultLines.add(report.getPublisher().getId());
                 resultLines.addAll(report.getAllRpms());
-            }
 //            Patch<String> diff = DiffUtils.diff(l0, l1);
 //            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo.size, l1.size));
+            }
         }
         List<RpmsReportSingle> files2 = data2.getIndex();
         for (RpmsReportSingle report : files2) {
             if (report.getAllRpms()!=null) {
+                resultLines.add(report.getPublisher().getId());
                 resultLines.addAll(report.getAllRpms());
-            }
 //            Patch<String> diff = DiffUtils.diff(l0, l1);
 //            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo.size, l1.size));
+            }
         }
         return resultLines;
     }
