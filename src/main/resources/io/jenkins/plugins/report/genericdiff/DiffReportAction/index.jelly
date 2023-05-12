@@ -1,0 +1,17 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form" xmlns:l="/lib/layout">
+    <l:layout title="${it.getDisplayName()} #${it.getThisBuild()}">
+        <l:main-panel>
+            <h2>${it.getDisplayName()} #${it.getRun()}</h2>
+            <f:form id="diffForm" action="dynamic-diff" method="GET" name="Set builds to comapre">
+                <f:entry title="Base build to comapre...">
+                    <f:number name="from" min="0" value="${it.getThisBuild()}"></f:number>
+                </f:entry>
+                <f:entry title="...to comapre with build:" >
+                    <f:number name="to" min="0" value="${it.getPreviousBuild()}"></f:number>
+                </f:entry>
+                <f:submit value="Compute" name="Compute"></f:submit>
+            </f:form>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>
