@@ -24,6 +24,9 @@
 package io.jenkins.plugins.report.genericdiff;
 
 
+import com.github.difflib.DiffUtils;
+import com.github.difflib.UnifiedDiffUtils;
+import com.github.difflib.patch.Patch;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.WebMethod;
@@ -34,8 +37,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
@@ -109,7 +116,7 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             } else {
                 RpmsReport dataFrom = new RpmsReport(pFrom, bFrom);
                 RpmsReport dataTo = new RpmsReport(pTo, bTo);
-                List<String> resultLines = comapre(dataFrom, dataTo, interesting);
+                List<String> resultLines = comapre(bFrom.getId(), bTo.getId(), dataFrom, dataTo, interesting);
                 for (String resultLine : resultLines) {
                     out.println(resultLine);
                 }
@@ -118,29 +125,53 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         out.flush();
     }
 
-    private List<String> comapre(RpmsReport data1, RpmsReport data2, String[] interesting) {
-        List<String> resultLines = new ArrayList<>();
+    private List<String> comapre(String id1, String id2, RpmsReport data1, RpmsReport data2, String[] interesting) {
         List<RpmsReportSingle> files1 = data1.getIndex();
-        //first gather all ids, then iterate through both sets.
-        //if some of them do not have that id, then all + or -...
-        // and also if it mathes any of the interesting regexes...
-        for (RpmsReportSingle report : files1) {
-            if (report.getAllRpms() != null) {
-                resultLines.add(report.getPublisher().getId());
-                resultLines.addAll(report.getAllRpms());
-//            Patch<String> diff = DiffUtils.diff(l0, l1);
-//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo
-//            .size, l1.size));
-            }
-        }
         List<RpmsReportSingle> files2 = data2.getIndex();
-        for (RpmsReportSingle report : files2) {
-            if (report.getAllRpms() != null) {
-                resultLines.add(report.getPublisher().getId());
-                resultLines.addAll(report.getAllRpms());
-//            Patch<String> diff = DiffUtils.diff(l0, l1);
-//            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(name0, name1, l0, diff, Math.max(lo
-//            .size, l1.size));
+        Set<String> idsu = new HashSet<>();
+        idsu.addAll(files1.stream().map(r -> r.getPublisher().getId()).collect(Collectors.toList()));
+        idsu.addAll(files2.stream().map(r -> r.getPublisher().getId()).collect(Collectors.toList()));
+        List<String> ids = new ArrayList<>(idsu);
+        Collections.sort(ids);
+
+        List<String> resultLines = new ArrayList<>();
+        for (String id : ids) {
+            boolean wished = false;
+            for (String s : interesting) {
+                if (id.matches(s)) {
+                    wished = true;
+                    break;
+                }
+            }
+            if (!wished) {
+                continue;
+            }
+            List<String> thisComaprsion1 = new ArrayList<>(0);
+            List<String> thisComaprsion2 = new ArrayList<>(0);
+            for (RpmsReportSingle report : files1) {
+                if (report.getPublisher().getId().equals(id)) {
+                    if (report.getAllRpms() != null) {
+                        thisComaprsion1 = report.getAllRpms();
+                    }
+                }
+            }
+            for (RpmsReportSingle report : files2) {
+                if (report.getPublisher().getId().equals(id)) {
+                    if (report.getAllRpms() != null) {
+                        thisComaprsion2 = report.getAllRpms();
+                    }
+                }
+            }
+            Patch<String> diff = DiffUtils.diff(thisComaprsion2, thisComaprsion1);
+            List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
+                    id2 + "/" + id, id1 + "/" + id,
+                    thisComaprsion2, diff,
+                    Math.max(thisComaprsion2.size(), thisComaprsion1.size()));
+            if (unifiedDiff.isEmpty()){
+                resultLines.add(id2 + "/" + id + " and " + id1 + "/" + id + " are identical");
+                resultLines.add(" ");
+            } else {
+                resultLines.addAll(unifiedDiff);
             }
         }
         return resultLines;
