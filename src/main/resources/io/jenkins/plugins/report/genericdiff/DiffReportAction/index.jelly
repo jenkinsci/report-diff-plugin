@@ -10,8 +10,8 @@
                 <f:entry title="...to comapre with build:" >
                     <f:number name="to" min="0" value="${it.getPreviousBuild()}"></f:number>
                 </f:entry>
-                <f:entry title="patch context (0 = all):" >
-                    <f:number name="context"  value="0"></f:number>
+                <f:entry title="patch context (negative = all):" >
+                    <f:number name="context"  value="-1"></f:number>
                 </f:entry>
                 <f:entry title="interested comparisons (you can use regex when manually setting up url)" >
                     <select name="ids" multiple="true">

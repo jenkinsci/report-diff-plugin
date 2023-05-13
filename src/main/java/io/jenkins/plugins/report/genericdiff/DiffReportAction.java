@@ -80,25 +80,46 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         PrintWriter out = res.getWriter();
 
         String[] interesting = req.getParameterValues("ids");
-        if (interesting == null) {
+        if (interesting == null || interesting.length == 0 || interesting[0].isEmpty()) {
             interesting = new String[]{".*"};
         }
+        String sContext = req.getParameter("context");
+        if (sContext == null || sContext.isEmpty()) {
+            sContext = "-1";
+        }
+        long context = -1;
         try {
-            long from = Long.parseLong(req.getParameter("from"));
-            long to = Long.parseLong(req.getParameter("to"));
+            context = Long.parseLong(sContext);
         } catch (NumberFormatException e) {
+            context = -1;
+        }
+
+        String sFrom = req.getParameter("from");
+        String sTo = req.getParameter("to");
+
+        if (sFrom == null || sTo == null || sFrom.isEmpty() || sTo.isEmpty()) {
             res.setStatus(404);
-            out.print("Couldn't parse input");
+            out.print("expected from and to arguments at least");
             out.flush();
             return;
         }
 
-        long from = Long.parseLong(req.getParameter("from"));
-        long to = Long.parseLong(req.getParameter("to"));
+        try {
+            long from = Long.parseLong(sFrom);
+            long to = Long.parseLong(sTo);
+        } catch (NumberFormatException e) {
+            res.setStatus(404);
+            out.print("from and two are supposed to be number");
+            out.flush();
+            return;
+        }
+
+        long from = Long.parseLong(sFrom);
+        long to = Long.parseLong(sTo);
 
         if (from <= 0 || to <= 0) {
             res.setStatus(404);
-            out.print("Invalid parameters");
+            out.print("from and to have to be positive");
         } else {
             AbstractBuild<?, ?> bFrom = this.build.getProject().getBuild(from + "");
             AbstractBuild<?, ?> bTo = this.build.getProject().getBuild(to + "");
@@ -116,7 +137,7 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             } else {
                 RpmsReport dataFrom = new RpmsReport(pFrom, bFrom);
                 RpmsReport dataTo = new RpmsReport(pTo, bTo);
-                List<String> resultLines = comapre(bFrom.getId(), bTo.getId(), dataFrom, dataTo, interesting);
+                List<String> resultLines = comapre(bFrom.getId(), bTo.getId(), dataFrom, dataTo, interesting, context);
                 for (String resultLine : resultLines) {
                     out.println(resultLine);
                 }
@@ -125,7 +146,9 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
         out.flush();
     }
 
-    private List<String> comapre(String id1, String id2, RpmsReport data1, RpmsReport data2, String[] interesting) {
+    private List<String> comapre(String id1, String id2,
+                                 RpmsReport data1, RpmsReport data2,
+                                 String[] interesting, long contex) {
         List<RpmsReportSingle> files1 = data1.getIndex();
         List<RpmsReportSingle> files2 = data2.getIndex();
         Set<String> idsu = new HashSet<>();
@@ -163,13 +186,23 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
                 }
             }
             Patch<String> diff = DiffUtils.diff(thisComaprsion2, thisComaprsion1);
+            int usedContext = (int) contex;
+            if (contex < 0) {
+                usedContext = Math.max(thisComaprsion2.size(), thisComaprsion1.size());
+            }
             List<String> unifiedDiff = UnifiedDiffUtils.generateUnifiedDiff(
                     id2 + "/" + id, id1 + "/" + id,
                     thisComaprsion2, diff,
-                    Math.max(thisComaprsion2.size(), thisComaprsion1.size()));
-            if (unifiedDiff.isEmpty()){
-                resultLines.add(id2 + "/" + id + " and " + id1 + "/" + id + " are identical");
-                resultLines.add(" ");
+                    usedContext);
+            if (unifiedDiff.isEmpty()) {
+                resultLines.add("--- " + id2 + "/" + id);
+                resultLines.add("+++ " + id1 + "/" + id);
+                resultLines.add("@@ " + id2 + "/" + id + " and " + id1 + "/" + id + " are identical @@");
+                if (contex < 0) {
+                    resultLines.addAll(thisComaprsion1);
+                } else {
+                    resultLines.add(" ");
+                }
             } else {
                 resultLines.addAll(unifiedDiff);
             }
