@@ -82,7 +82,7 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
             }
         }
         return DefaultStrings.PATCH_URL + "/" + DefaultStrings.DIFF_COMPUTED_URL +
-                "?from=" + thisId + "&to=" + prevId + "&ids=.*";
+                "?from=" + thisId + "&to=" + prevId + "&ids=.*&context=-1";
     }
 
 
