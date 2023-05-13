@@ -6,6 +6,7 @@ import java.util.Map;
 public class DefaultStrings {
 
 
+
     public static String get(String value, String defaultValue) {
         if (value == null || value.trim().isEmpty()) {
             return defaultValue;
@@ -30,8 +31,9 @@ public class DefaultStrings {
 
     //no setup-able plugin title
     public static final String MAIN_TITLE_REPORT = "Diff chart report"; //"Installed RPMs report";
-    public static final String DIFF_TITLE_REPORT = "Patch report"; //"Installed RPMs report";
+    public static final String DIFF_TITLE_REPORT = "Patch like report"; //"Installed RPMs report";
     //urls
     public static final String RPMS_URL = "rpms";
-    public static final String PATCH_URL = "patch";
+    public static final String PATCH_URL = "patch"; //to set up values
+    public static final String DIFF_COMPUTED_URL = "dynamic-diff"; //to calc it
 }

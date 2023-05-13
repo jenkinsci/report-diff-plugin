@@ -70,7 +70,7 @@ public class RpmsReport {
     }
 
     public String getPreviousLink() {
-        return "../../" + (getBuildNumber() - 1) + "/rpms";
+        return "../../" + (getBuildNumber() - 1) + "/"+DefaultStrings.RPMS_URL;
     }
 
     public String getPreviousLinkName() {
@@ -78,7 +78,7 @@ public class RpmsReport {
     }
 
     public String getNextLink() {
-        return "../../" + (getBuildNumber() + 1) + "/rpms";
+        return "../../" + (getBuildNumber() + 1) + "/"+DefaultStrings.RPMS_URL;
     }
 
     public String getNextLinkName() {

@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
     <t:summary icon="clipboard.png">
-        <a href="${it.urlName}/">${it.displayName}:</a>
+        <a href="${it.urlName}/">${it.displayName}</a>/<a href="${it.diffUrlName}">patch</a>:
         <st:nbsp/>
         <j:set var="rpms" value="${it.target}"/>
         <j:forEach var="report" items="${rpms.summary}">
