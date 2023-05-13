@@ -109,7 +109,7 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             long to = Long.parseLong(sTo);
         } catch (NumberFormatException e) {
             res.setStatus(404);
-            out.print("from and two are supposed to be number");
+            out.print("from and to are supposed to be numbers");
             out.flush();
             return;
         }
