@@ -8,8 +8,8 @@ Jenkins plugin to monittor comaprable content on system
     * [customizations](#customizations)
 * [Multiple diffs](#multiple-diffs)
 * [Changing build status](#changing-build-status)
-* [Future work](#future-work)
-* [Limitations](#limitations)
+* [Dynamic patch-like view](#dynamic-patch-like-view)
+* [Dependences](#dependences)
     
 This plugin allows you to monitor any difference in output of file or of rnu of any command, where unit is an line.
 Exemplar usage is `rpm -qa` - then during every run, all packages on system are stored, and during next run they are compared.
@@ -60,8 +60,24 @@ You can set up plugin to change build status to unstable if there is change dete
 
 You can set up plugin to change build status to failed if there command/readign fails and/or nothing is read.
 
-## Future work
-Plain diff and visualised diff based on https://github.com/java-diff-utils/java-diff-utils is on the way
 
-## Limitations
+## Dynamic patch-like view
+The plugin can dynamicaly calcualte difference in monitored files/commands between any two jobs in patch-like view. From main screen:
+
+![patch1](https://github.com/jenkinsci/report-diff-plugin/assets/2904395/102acd87-1e67-44d7-b992-f9f1fcc4cf49)
+
+You can click **/patch:** whch will bring you directly to diff, eg *.../45/patch/dynamic-diff?from=45&to=44&ids=.\*&context=-1*:
+
+![patch2](https://github.com/jenkinsci/report-diff-plugin/assets/2904395/a28412d6-4437-419f-a458-324d1f5ea1d4)
+
+where you can modify the GET parameters as needed. Or you can clicl the **Patch like report** whcih will bring you to form:
+
+![patch3](https://github.com/jenkinsci/report-diff-plugin/assets/2904395/ac8b7707-3314-4601-9924-8486ecfc0ab2)
+
+Which allows you to set the GET parameter via gui.
+
+Note, that individual *ids* are in reality regexes. 
+Plain diff and visualised diff is based on https://github.com/java-diff-utils/java-diff-utils 
+
+## Dependences
 This plugin depends on [chartjs-api](https://github.com/jenkinsci/chartjs-api-plugin) library plugin
