@@ -37,72 +37,56 @@ if (rpmcharts_ids != null) {
             var titles = titles_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
         }
         var allRpms = {
-          type: 'line',
-          data:   {
           labels: data_labels,
           datasets: [
           {
             label: titles[0],
-            fill: true,
-            backgroundColor: "rgba(128,255,128,0.2)",
-            borderColor: "rgba(128,255,128,1)",
-            pointBackgroundColor: "rgba(128,255,128,1)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgba(128,255,128,1)",
-            pointRadius: 5,
+            fillColor: "rgba(128,255,128,0.2)",
+            strokeColor: "rgba(128,255,128,1)",
+            pointColor: "rgba(128,255,128,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(128,255,128,1)",
             data: data_installed
           },
           {
             label: titles[1],
-            fill: true,
-            backgroundColor: "rgba(255,128,128,0.2)",
-            borderColor: "rgba(255,128,128,1)",
-            pointBackgroundColor: "rgba(255,128,128,1)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgba(255,128,128,1)",
-            pointRadius: 5,
+            fillColor: "rgba(255,128,128,0.2)",
+            strokeColor: "rgba(255,128,128,1)",
+            pointColor: "rgba(255,128,128,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(255,128,128,1)",
             data: data_removed
           },
           {
             label: titles[2],
-            fill: true,
-            backgroundColor: "rgba(128,128,128,0.2)",
-            borderColor: "rgba(128,128,128,1)",
-            pointBackgroundColor: "rgba(128,128,128,1)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgba(128,128,128,1)",
-            pointRadius: 5,
+            fillColor: "rgba(128,128,128,0.2)",
+            strokeColor: "rgba(128,128,128,1)",
+            pointColor: "rgba(128,128,128,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(128,128,128,1)",
             data: data_total
           }
         ]
-        },
-        options: {
-          plugins: {
-            legend: { display: false }
-          },
-          interaction: {
-            mode: 'index',
-            intersect: false
-          },
-          onClick: (e) => {
-            var lid = e.chart.canvas.id
-            var jid = lid.replace("rpmsChart-", "")
-            var activePoints = diffChartClick[lid].getElementsAtEventForMode(e, 'index', { intersect: false }, true);
-            var point = activePoints[0]
-            var datasetIndex = point.datasetIndex //labels are for all data together,  no need to look into exact dataset
-            var index = point.index
-            var result = diffChartClick[lid].config.data.labels[index]
-            var buildId = result.substring(result.lastIndexOf(":") + 1)
-            window.open("" + buildId + "/rpms#"+jid, "_blank");
-          }
-        }
         };
+          var options = {
+            bezierCurve: false,
+             multiTooltipTemplate: "<%= datasetLabel + \": \" + value %>"
+             };
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart-"+id).getContext("2d");
-        diffChartClick["rpmsChart-"+id] = new Chart(ctx, allRpms);
+        diffChartClick["rpmsChart-"+id] = new Chart(ctx).Line(allRpms, options);
+        document.getElementById("rpmsChartContainer-" + id).onclick = function (evt) {
+          var lid = event.target.id;
+          var jid = lid.replace("rpmsChart-", "")
+          var activePoints = diffChartClick["rpmsChart-"+jid].getPointsAtEvent(evt);
+          var point = activePoints[0];
+          var result = point.label;
+          var buildId = result.substring(result.lastIndexOf(":") + 1)
+          window.open("" + buildId + "/rpms#"+jid, "_blank");
+        };
     }
 }
         // ]]>

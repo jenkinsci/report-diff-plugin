@@ -12,10 +12,10 @@
     <packaging>hpi</packaging>
     <name>report diff</name>
     <properties>
-        <revision>4.0</revision>
+        <revision>3.0</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/report-diff-plugin</gitHubRepo>
-        <chartjs.version>4.2.1.5</chartjs.version>
+        <chartjs.version>1.0.2.6</chartjs.version>
         <jenkins.version>2.361.4</jenkins.version>
     </properties>
 
