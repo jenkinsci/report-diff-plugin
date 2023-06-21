@@ -1,12 +1,41 @@
         // <![CDATA[
 var rpmcharts_ids = document.getElementById('rpmsChartContainer-ids').textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-for (let i = 0; i < rpmcharts_ids.length; i++) {
+if (rpmcharts_ids != null) {
+    for (let i = 0; i < rpmcharts_ids.length; i++) {
         var id = rpmcharts_ids[i]
-        var data_labels = document.getElementById('rpmsChartContainer-labels-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-        var data_installed = document.getElementById('rpmsChartContainer-installed-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-        var data_removed = document.getElementById('rpmsChartContainer-removed-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-        var data_total = document.getElementById('rpmsChartContainer-total-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
-        var titles = document.getElementById('rpmsChartContainer-titles-'+id).textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        if (id == null) {
+            continue
+        }
+        var data_labels_element = document.getElementById('rpmsChartContainer-labels-'+id)
+        if (data_labels_element == null) {
+            continue
+        } else {
+            var data_labels = data_labels_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        }
+        var data_installed_element = document.getElementById('rpmsChartContainer-installed-'+id)
+        if (data_installed_element == null) {
+            continue
+        } else {
+            var data_installed = data_installed_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        }
+        var data_removed_element = document.getElementById('rpmsChartContainer-removed-'+id)
+        if (data_removed_element == null) {
+            continue
+        } else {
+            var data_removed = data_removed_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        }
+        var data_total_element = document.getElementById('rpmsChartContainer-total-'+id)
+        if (data_total_element == null) {
+            continue
+        } else {
+            var data_total = data_total_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        }
+        var titles_element = document.getElementById('rpmsChartContainer-titles-'+id)
+        if (titles_element == null) {
+            continue
+        } else {
+            var titles = titles_element.textContent.split(/\s*,\s*/).flatMap((s) => (s.trim()));
+        }
         var allRpms = {
           type: 'line',
           data:   {
@@ -74,5 +103,6 @@ for (let i = 0; i < rpmcharts_ids.length; i++) {
         // Get the context of the canvas element we want to select
         var ctx = document.getElementById("rpmsChart-"+id).getContext("2d");
         diffChartClick["rpmsChart-"+id] = new Chart(ctx, allRpms);
+    }
 }
         // ]]>
