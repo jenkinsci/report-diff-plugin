@@ -80,6 +80,7 @@ if (rpmcharts_ids != null) {
         ]
         },
         options: {
+          responsive: false,
           plugins: {
             legend: { display: false }
           },

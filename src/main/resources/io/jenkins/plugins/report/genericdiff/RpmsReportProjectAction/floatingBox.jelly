@@ -51,7 +51,7 @@
                         ${chart.chartTotal}
                     </span>
                     <div id="rpmsChartContainer-${chart.id}">
-                        <canvas id='rpmsChart-${chart.id}' width='500' height='500'></canvas>
+                        <canvas id='rpmsChart-${chart.id}' width='600' height='600'></canvas>
                     </div>
                 </j:otherwise>
             </j:choose>
