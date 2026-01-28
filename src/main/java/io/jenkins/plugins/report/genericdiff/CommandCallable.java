@@ -33,9 +33,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +55,9 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         this.command = command;
     }
 
+    /*
+     * Called when job finishes, cache diff and full listing for future diffing
+     */
     @Override
     public List<String> invoke(File f, VirtualChannel vchannel) throws IOException, InterruptedException {
         try {
@@ -60,6 +66,9 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
             if (kandidateFile.exists()) {
                 LOG.info("Reading " + command.trim() + " (" + kandidateFile.getAbsolutePath() + ")");
                 stdout = FileToString(kandidateFile);
+            } else if (mayBeArchive(kandidateFile, ".zip") != null) {
+                LOG.info("Getting from Zip " + command.trim());
+                stdout = FileFromZipToString(kandidateFile);
             } else {
                 LOG.info("Executing `" + command.trim() + "` in" + f.toString() + " (" + f.getAbsolutePath() + ")");
                 Process process = new ProcessBuilder(command.trim().split(" "))
@@ -107,6 +116,39 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         try (FileInputStream fis = new FileInputStream(filePath)) {
             return readStream(fis);
         }
+    }
+
+    private File mayBeArchive(File filePath, String suffix) throws IOException {
+        while (filePath.getParent() != null) {
+            filePath = filePath.getParentFile();
+            if (filePath.exists() && filePath.isFile() && filePath.toString().endsWith(suffix)) {
+                return filePath;
+            }
+        }
+        return null;
+    }
+
+    private String FileFromZipToString(File filePath) throws IOException {
+        File zipFilePath = mayBeArchive(filePath, ".zip");
+        if (zipFilePath == null) {
+            throw new IOException("No file found on path");
+        }
+        String zipItem = filePath.toString().replace(zipFilePath.toString(), "");
+        while (zipItem.startsWith("/") || zipItem.startsWith("\\")) {
+            zipItem = zipItem.substring(1);
+        }
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (!entry.isDirectory() && entry.getName().equals(zipItem)) {
+                    try (InputStream is = zipFile.getInputStream(entry)) {
+                        return readStream(is);
+                    }
+                }
+            }
+        }
+        throw new IOException("Item " + zipItem + " not found in " + zipFilePath);
     }
 
     public static String readStream(InputStream is) throws IOException {

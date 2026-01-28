@@ -86,6 +86,9 @@ public class RpmsReportActionOneSummary {
     }
 
 
+    /*
+     * Reads cached item
+     */
     private List<String> readFile(String fileName) {
         File file = new File(build.getRootDir(), fileName);
         if (file.exists() && file.isFile() && file.canRead()) {
