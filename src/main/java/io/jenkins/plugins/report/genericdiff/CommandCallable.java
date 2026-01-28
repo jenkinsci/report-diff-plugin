@@ -23,7 +23,6 @@
  */
 package io.jenkins.plugins.report.genericdiff;
 
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
 import jenkins.MasterToSlaveFileCallable;
 
@@ -78,7 +77,7 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
                 stdout = FileToString(kandidateFile);
             } else if (mayBeArchive(kandidateFile) != null) {
                 LOG.info("Getting from archive " + command.trim());
-                stdout = FileFromZipToString(kandidateFile);
+                stdout = fileFromArchiveToString(kandidateFile);
             } else {
                 LOG.info("Executing `" + command.trim() + "` in" + f.toString() + " (" + f.getAbsolutePath() + ")");
                 Process process = new ProcessBuilder(command.trim().split(" "))
@@ -128,7 +127,7 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         }
     }
 
-    private String compressionType(File path) {
+    private static String compressionType(File path) {
         for (Map.Entry<String, ArchiveFactory> factory : SUPPORTED_ARCHIVE_TYPES_MAP.entrySet()) {
             String pathName = path.toString();
             if (pathName.toLowerCase().endsWith(factory.getKey())) {
@@ -138,7 +137,7 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         return null;
     }
 
-    private File mayBeArchive(File filePath) throws IOException {
+    private static File mayBeArchive(File filePath) throws IOException {
         while (filePath != null) {
             if (filePath.exists() && filePath.isFile()) {
                 if (compressionType(filePath) != null) {
@@ -168,7 +167,7 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         return Collections.unmodifiableMap(map);
     }
 
-    private ArchiveInputStream streamPath(File path) throws IOException {
+    private static ArchiveInputStream streamPath(File path) throws IOException {
         for (Map.Entry<String, ArchiveFactory> factory : SUPPORTED_ARCHIVE_TYPES_MAP.entrySet()) {
             String pathName = path.toString().toLowerCase();
             if (pathName.endsWith(factory.getKey())) {
@@ -179,22 +178,21 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         throw new IOException("Unsupported archive format: " + path);
     }
 
-    private String FileFromZipToString(File filePath) throws IOException {
-        File zipFilePath = mayBeArchive(filePath);
-        String zipItem = filePath.toString().replace(zipFilePath.toString(), "");
-        while (zipItem.startsWith("/") || zipItem.startsWith("\\")) {
-            zipItem = zipItem.substring(1);
+    private static String fileFromArchiveToString(File filePath) throws IOException {
+        File archiveFilePath = mayBeArchive(filePath);
+        String archiveItem = filePath.toString().replace(archiveFilePath.toString(), "");
+        while (archiveItem.startsWith("/") || archiveItem.startsWith("\\")) {
+            archiveItem = archiveItem.substring(1);
         }
-
-        try (ArchiveInputStream in = streamPath(zipFilePath)) {
+        try (ArchiveInputStream in = streamPath(archiveFilePath)) {
             ArchiveEntry entry;
             while ((entry = in.getNextEntry()) != null) {
-                if (!entry.isDirectory() && entry.getName().equals(zipItem)) {
+                if (!entry.isDirectory() && entry.getName().equals(archiveItem)) {
                     return readStream(new CloseShieldInputStream(in));
                 }
             }
         }
-        throw new IOException("Item " + zipItem + " not found in " + zipFilePath);
+        throw new IOException("Item " + archiveItem + " not found in " + archiveFilePath);
     }
 
     public static String readStream(InputStream is) throws IOException {
