@@ -4,21 +4,24 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>4.55</version>
+        <version>5.2102.v5f5fe09fccf1</version>
+        <relativePath />
     </parent>
-    <groupId>io.jenkins.plugins</groupId>
-    <artifactId>report-diff</artifactId>
-    <version>${revision}${changelist}</version>
-    <packaging>hpi</packaging>
-    <name>report diff</name>
     <properties>
-        <revision>4.3</revision>
+        <revision>4.4</revision>
         <changelist>-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/report-diff-plugin</gitHubRepo>
         <chartjs.version>4.2.1.5</chartjs.version>
         <jenkins.version>2.361.4</jenkins.version>
+        <jenkins.baseline>2.479</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+        <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     </properties>
-
+    <artifactId>report-diff</artifactId>
+    <version>${revision}${changelist}</version>
+    <packaging>hpi</packaging>
+    <name>report diff</name>
     <developers>
         <developer>
             <id>judovana</id>
