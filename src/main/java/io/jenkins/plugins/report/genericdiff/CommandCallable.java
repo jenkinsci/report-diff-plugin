@@ -27,25 +27,35 @@ import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
 import jenkins.MasterToSlaveFileCallable;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Enumeration;
+import java.nio.file.Files;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.ArchiveInputStream;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.io.input.CloseShieldInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
 
     private static final Logger LOG = LoggerFactory.getLogger(CommandCallable.class);
+    private static final Map<String, ArchiveFactory> SUPPORTED_ARCHIVE_TYPES_MAP = createSupportedArchiveTypesMap();
     private final String command;
 
     public CommandCallable(String command) {
@@ -66,8 +76,8 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
             if (kandidateFile.exists()) {
                 LOG.info("Reading " + command.trim() + " (" + kandidateFile.getAbsolutePath() + ")");
                 stdout = FileToString(kandidateFile);
-            } else if (mayBeArchive(kandidateFile, ".zip") != null) {
-                LOG.info("Getting from Zip " + command.trim());
+            } else if (mayBeArchive(kandidateFile) != null) {
+                LOG.info("Getting from archive " + command.trim());
                 stdout = FileFromZipToString(kandidateFile);
             } else {
                 LOG.info("Executing `" + command.trim() + "` in" + f.toString() + " (" + f.getAbsolutePath() + ")");
@@ -118,33 +128,69 @@ public class CommandCallable extends MasterToSlaveFileCallable<List<String>> {
         }
     }
 
-    private File mayBeArchive(File filePath, String suffix) throws IOException {
-        while (filePath.getParent() != null) {
-            filePath = filePath.getParentFile();
-            if (filePath.exists() && filePath.isFile() && filePath.toString().endsWith(suffix)) {
-                return filePath;
+    private String compressionType(File path) {
+        for (Map.Entry<String, ArchiveFactory> factory : SUPPORTED_ARCHIVE_TYPES_MAP.entrySet()) {
+            String pathName = path.toString();
+            if (pathName.toLowerCase().endsWith(factory.getKey())) {
+                return factory.getKey();
             }
         }
         return null;
     }
 
-    private String FileFromZipToString(File filePath) throws IOException {
-        File zipFilePath = mayBeArchive(filePath, ".zip");
-        if (zipFilePath == null) {
-            throw new IOException("No file found on path");
+    private File mayBeArchive(File filePath) throws IOException {
+        while (filePath != null) {
+            if (filePath.exists() && filePath.isFile()) {
+                if (compressionType(filePath) != null) {
+                    return filePath;
+                } else {
+                    return null;
+                }
+            }
+            filePath = filePath.getParentFile();
         }
+        return null;
+    }
+
+    @FunctionalInterface
+    private interface ArchiveFactory {
+
+        ArchiveInputStream create(InputStream in) throws IOException;
+    }
+
+    private static Map<String, ArchiveFactory> createSupportedArchiveTypesMap() {
+        Map<String, ArchiveFactory> map = new HashMap<>();
+        map.put(".zip", in -> new ZipArchiveInputStream(in));
+        map.put(".tar", in -> new TarArchiveInputStream(in));
+        map.put(".tar.gz", in -> new TarArchiveInputStream(new GzipCompressorInputStream(in)));
+        map.put(".tar.bz2", in -> new TarArchiveInputStream(new BZip2CompressorInputStream(in)));
+        map.put(".tar.xz", in -> new TarArchiveInputStream(new org.tukaani.xz.XZInputStream(in)));
+        return Collections.unmodifiableMap(map);
+    }
+
+    private ArchiveInputStream streamPath(File path) throws IOException {
+        for (Map.Entry<String, ArchiveFactory> factory : SUPPORTED_ARCHIVE_TYPES_MAP.entrySet()) {
+            String pathName = path.toString().toLowerCase();
+            if (pathName.endsWith(factory.getKey())) {
+                InputStream stream = new BufferedInputStream(Files.newInputStream(path.toPath()));
+                return factory.getValue().create(stream);
+            }
+        }
+        throw new IOException("Unsupported archive format: " + path);
+    }
+
+    private String FileFromZipToString(File filePath) throws IOException {
+        File zipFilePath = mayBeArchive(filePath);
         String zipItem = filePath.toString().replace(zipFilePath.toString(), "");
         while (zipItem.startsWith("/") || zipItem.startsWith("\\")) {
             zipItem = zipItem.substring(1);
         }
-        try (ZipFile zipFile = new ZipFile(zipFilePath)) {
-            Enumeration<? extends ZipEntry> entries = zipFile.entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
+
+        try (ArchiveInputStream in = streamPath(zipFilePath)) {
+            ArchiveEntry entry;
+            while ((entry = in.getNextEntry()) != null) {
                 if (!entry.isDirectory() && entry.getName().equals(zipItem)) {
-                    try (InputStream is = zipFile.getInputStream(entry)) {
-                        return readStream(is);
-                    }
+                    return readStream(new CloseShieldInputStream(in));
                 }
             }
         }

@@ -14,15 +14,15 @@
   </f:entry>
   <h3>Individual commands/files to compare in time.<u>Always fill ID!</u></h3>
   <f:repeatable field="configurations">
-    <f:entry field="command" title="Command or file. Maybe also path/some.zip/item/inside. Suffix meters.">
+    <f:entry field="command" title="workspace based command or file. Also path/some.zip/item/inside. Suffix meters (.zip,.tar,.tar.gz,.tar.bz2,.tar.xz)">
         <f:textbox  clazz="required"/>
     </f:entry>
-      <f:entry field="id" title="ID of this comaprsion. If you change it, you will lost (or change) baseline. Two same IDs will rewrite each other">
+      <f:entry field="id" title="ID of this comparison. If you change it, you will lost (or change) baseline. Two same IDs will rewrite each other">
          <f:textbox  clazz="required"/>
     </f:entry>
     <f:section title="Set custom titles">
       <f:advanced>
-      <!-- Todo, would be fine to repalce hardcoded defaults to code refference, but I have nto found how-->
+      <!-- Todo, would be fine to replace hardcoded defaults to code reference, but I have nto found how-->
         <f:entry field="maintitle" title="Main title (chart and link to details), defaults to `Diff chart`. Creative example for `rpm -qa` command: `RPM Changes`">
           <f:textbox />
         </f:entry>
