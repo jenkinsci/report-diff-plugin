@@ -72,5 +72,12 @@
             <artifactId>xz</artifactId>
             <version>1.9</version>
         </dependency>
+        <!-- warning, conflicting dependence with jenkins. Version must be kept aligned -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.21</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>
