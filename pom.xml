@@ -4,18 +4,16 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>5.2102.v5f5fe09fccf1</version>
+        <version>6.2116.v7501b_67dc517</version>
         <relativePath />
     </parent>
     <properties>
         <revision>4.7</revision>
         <changelist>-SNAPSHOT</changelist>
-        <gitHubRepo>jenkinsci/report-diff-plugin</gitHubRepo>
-        <chartjs.version>4.2.1.5</chartjs.version>
-        <jenkins.version>2.361.4</jenkins.version>
-        <jenkins.baseline>2.479</jenkins.baseline>
-        <jenkins.version>${jenkins.baseline}.1</jenkins.version>
         <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
+        <chartjs.version>4.2.1.5</chartjs.version>
+        <jenkins.baseline>2.528</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
         <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     </properties>
     <groupId>io.jenkins.plugins</groupId>
@@ -56,6 +54,17 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.jenkins.tools.bom</groupId>
+                <artifactId>bom-${jenkins.baseline}.x</artifactId>
+                <version>6005.v4235c33d86a_5</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>io.jenkins.plugins</groupId>
@@ -78,6 +87,31 @@
             <artifactId>commons-compress</artifactId>
             <version>1.21</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- Test dependencies for pipeline support -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-job</artifactId>
+            <version>1540.v295eccc9778f</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>3996.va_f5c1799f978</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-durable-task-step</artifactId>
+            <version>1458.va_2e10a_a_b_7c4d</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-basic-steps</artifactId>
+            <version>1098.v808b_fd7f8cf4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

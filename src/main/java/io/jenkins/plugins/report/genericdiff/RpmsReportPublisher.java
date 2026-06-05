@@ -23,16 +23,21 @@
  */
 package io.jenkins.plugins.report.genericdiff;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import jenkins.tasks.SimpleBuildStep;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,7 +56,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 
-public class RpmsReportPublisher extends Recorder {
+public class RpmsReportPublisher extends Recorder implements SimpleBuildStep {
 
     private boolean moveunstable;
     private boolean movefailed;
@@ -72,41 +77,50 @@ public class RpmsReportPublisher extends Recorder {
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+        return performImpl(build, build.getWorkspace(), launcher, listener);
+    }
+
+    @Override
+    public void perform(@NonNull Run<?, ?> run, @NonNull FilePath workspace, @NonNull Launcher launcher, @NonNull TaskListener listener) throws InterruptedException, IOException {
+        performImpl(run, workspace, launcher, listener);
+    }
+
+    private boolean performImpl(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
         boolean result = true;
         List<String> changeditems = new ArrayList<>();
         List<String> failedItems = new ArrayList<>();
         List<String> emptyItems = new ArrayList<>();
         for (RpmsReportOneRecord configuration : getConfigurations()) {
-            RpmsReportPublisherImpl.Result run = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(build);
-            if (run.isChanged()) {
+            RpmsReportPublisherImpl.Result runResult = new RpmsReportPublisherImpl(configuration.getCommand(), configuration.getId()).perform(run, workspace);
+            if (runResult.isChanged()) {
                 changeditems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
             }
-            if (run.isBroken()) {
+            if (runResult.isBroken()) {
                 failedItems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
             } else {
-                if (run.isEmpty()) {
+                if (runResult.isEmpty()) {
                     emptyItems.add(configuration.getId() + "(" + configuration.getCommand() + ")");
                 }
             }
 
         }
-        DiffReportAction diff = new DiffReportAction(build);
-        build.addAction(diff);
-        RpmsReportAction action = new RpmsReportAction(build);
-        build.addAction(action);
+        DiffReportAction diff = new DiffReportAction(run);
+        run.addAction(diff);
+        RpmsReportAction action = new RpmsReportAction(run, this);
+        run.addAction(action);
         FormValidation fv = doCheckConfigurations(configurations);
         listener.getLogger().println("[diff plugin] ID validation " + fv.kind + " " + fv.getMessage());
         listener.getLogger().println("[diff plugin] found changes in: " + changeditems);
         listener.getLogger().println("[diff plugin] possible error in: " + failedItems);
         listener.getLogger().println("[diff plugin] empty readings: " + emptyItems);
         if (isMoveunstable() && changeditems.size() > 0) {
-            build.setResult(Result.UNSTABLE);
+            run.setResult(Result.UNSTABLE);
         }
         if (isMovefailed() && failedItems.size() > 0) {
-            build.setResult(Result.FAILURE);
+            run.setResult(Result.FAILURE);
         }
         if (isMoveempty() && emptyItems.size() > 0) {
-            build.setResult(Result.FAILURE);
+            run.setResult(Result.FAILURE);
         }
         return result;
     }

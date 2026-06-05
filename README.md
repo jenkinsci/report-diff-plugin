@@ -81,3 +81,38 @@ Plain diff and visualised diff is based on https://github.com/java-diff-utils/ja
 
 ## Dependences
 This plugin depends on [chartjs-api](https://github.com/jenkinsci/chartjs-api-plugin) library plugin
+
+## Pipelines
+
+Pipelines are supported. Eg:
+```
+    stage('diff plugin') {
+            steps {
+ step([
+     $class: 'RpmsReportPublisher',
+     buildstopast: 10,
+     moveunstable: false,
+     movefailed: false,
+     moveempty: false,
+     configurations: [[
+         id: 'test-id',
+         command: 'rpm -qa',
+         maintitle: 'Test Report',
+         addedlines: 'Added',
+         removedlines: 'Removed',
+         updatedlines: 'Changed',
+         nochanges: 'No changes'
+     ],[
+         id: 'date',
+         command: 'date',
+         maintitle: 'date',
+         addedlines: 'Added',
+         removedlines: 'Removed',
+         updatedlines: 'Changed',
+         nochanges: 'No changes'
+     ]]
+ ])
+            }
+        }
+
+```

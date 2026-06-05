@@ -24,9 +24,11 @@
 package io.jenkins.plugins.report.genericdiff;
 
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
+import hudson.model.Run;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,17 +41,31 @@ import org.kohsuke.stapler.StaplerProxy;
 
 public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
 
-    private final AbstractBuild<?, ?> build;
+    private final Run<?, ?> run;
+    private transient RpmsReportPublisher publisher;
 
-    public RpmsReportAction(AbstractBuild<?, ?> build) {
-        this.build = build;
+    public RpmsReportAction(Run<?, ?> run) {
+        this.run = run;
+    }
+    
+    public RpmsReportAction(Run<?, ?> run, RpmsReportPublisher publisher) {
+        this.run = run;
+        this.publisher = publisher;
     }
 
-    private RpmsReportPublisher getPublisher() {
-        DescribableList<Publisher, Descriptor<Publisher>> l = build.getProject().getPublishersList();
-        for (Publisher p : l.toArray(new Publisher[0])) {
-            if (p instanceof RpmsReportPublisher) {
-                return (RpmsReportPublisher) p;
+    public RpmsReportPublisher getPublisher() {
+        if (publisher != null) {
+            return publisher;
+        }
+        Job<?, ?> job = run.getParent();
+        if (job instanceof AbstractProject) {
+            AbstractProject<?, ?> project = (AbstractProject<?, ?>) job;
+            DescribableList<Publisher, Descriptor<Publisher>> l = project.getPublishersList();
+            for (Publisher p : l.toArray(new Publisher[0])) {
+                if (p instanceof RpmsReportPublisher) {
+                    publisher = (RpmsReportPublisher) p;
+                    return publisher;
+                }
             }
         }
         return null;
@@ -74,9 +90,9 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     public String getDiffUrlName() {
         String thisId = "0";
         String prevId = "0";
-        if (build != null) {
-            thisId = build.getId();
-            AbstractBuild<?, ?> bb = build.getPreviousNotFailedBuild();
+        if (run != null) {
+            thisId = run.getId();
+            Run<?, ?> bb = run.getPreviousNotFailedBuild();
             if (bb != null) {
                 prevId = bb.getId();
             }
@@ -88,13 +104,13 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public RpmsReport getTarget() {
-        return new RpmsReport(getPublisher(), build);
+        return new RpmsReport(getPublisher(), run);
     }
 
 
     @Override
     public Collection<? extends Action> getProjectActions() {
-        Job<?, ?> job = build.getParent();
+        Job<?, ?> job = run.getParent();
         return Collections.singleton(new RpmsReportProjectAction(job));
     }
 
