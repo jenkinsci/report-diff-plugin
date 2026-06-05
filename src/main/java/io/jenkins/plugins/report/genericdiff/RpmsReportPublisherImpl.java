@@ -1,7 +1,7 @@
 package io.jenkins.plugins.report.genericdiff;
 
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,20 +44,19 @@ public class RpmsReportPublisherImpl {
         }
     }
 
-    public Result perform(AbstractBuild<?, ?> build) throws InterruptedException, IOException {
-        if (build == null) { //spotbugs issue, otherwise never hit
+    public Result perform(Run<?, ?> run, FilePath workspace) throws InterruptedException, IOException {
+        if (run == null) { //spotbugs issue, otherwise never hit
             throw new IOException("No build found");
         }
         Result r = new Result();
         try {
-            FilePath ws = build.getWorkspace();
-            if (ws == null) { //spotbugs issue, otherwise never hit
+            if (workspace == null) { //spotbugs issue, otherwise never hit
                 throw new IOException("No workspace found");
             }
-            List<String> rpms = ws.act(new CommandCallable(command));
-            Files.write(new File(build.getRootDir(), Constants.getALL(id)).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            List<String> rpms = workspace.act(new CommandCallable(command));
+            Files.write(new File(run.getRootDir(), Constants.getALL(id)).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             r.total=rpms.size();
-            AbstractBuild previousBuild = build.getPreviousBuild();
+            Run<?, ?> previousBuild = run.getPreviousBuild();
             if (previousBuild != null) {
                 File prevRpmsFile = new File(previousBuild.getRootDir(), Constants.getALL(id));
                 if (prevRpmsFile.exists() && prevRpmsFile.isFile() && prevRpmsFile.canRead()) {
@@ -73,16 +72,16 @@ public class RpmsReportPublisherImpl {
                     }
 
                     List<String> removedRpms = prevRpms.stream().sorted().collect(Collectors.toList());
-                    Files.write(new File(build.getRootDir(), Constants.getNEW(id)).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                    Files.write(new File(run.getRootDir(), Constants.getNEW(id)).toPath(), rpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
                     r.changes+=rpms.size();
-                    Files.write(new File(build.getRootDir(), Constants.getREMOVED(id)).toPath(), removedRpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                    Files.write(new File(run.getRootDir(), Constants.getREMOVED(id)).toPath(), removedRpms, StandardCharsets.UTF_8, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
                     r.changes+=removedRpms.size();
 
                 }
             }
 
         } catch (OperationFailedException ex) {
-            Files.write(new File(build.getRootDir(), Constants.getCOMMAND_STDERR(id)).toPath(), Arrays.asList(ex.getMessage()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            Files.write(new File(run.getRootDir(), Constants.getCOMMAND_STDERR(id)).toPath(), Arrays.asList(ex.getMessage()), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             r.broken = true;
         }
         return r;

@@ -27,6 +27,7 @@ import hudson.model.Action;
 import hudson.model.Descriptor;
 import hudson.model.Job;
 import hudson.model.Project;
+import hudson.model.Run;
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
 
@@ -41,10 +42,23 @@ public class RpmsReportProjectAction implements Action {
 
     public RpmsReportProjectAction(Job<?, ?> job) {
         this.job = job;
-        DescribableList<Publisher, Descriptor<Publisher>> l = ((Project) job).getPublishersList();
-        for (Publisher p : l.toArray(new Publisher[0])) {
-            if (p instanceof RpmsReportPublisher) {
-                publisher = (RpmsReportPublisher) p;
+        // Try to get publisher from freestyle project
+        if (job instanceof Project) {
+            DescribableList<Publisher, Descriptor<Publisher>> l = ((Project) job).getPublishersList();
+            for (Publisher p : l.toArray(new Publisher[0])) {
+                if (p instanceof RpmsReportPublisher) {
+                    publisher = (RpmsReportPublisher) p;
+                    break;
+                }
+            }
+        } else {
+            // For pipeline jobs, try to get publisher from the last build's actions
+            Run<?, ?> lastBuild = job.getLastBuild();
+            if (lastBuild != null) {
+                RpmsReportAction action = lastBuild.getAction(RpmsReportAction.class);
+                if (action != null) {
+                    publisher = action.getPublisher();
+                }
             }
         }
     }

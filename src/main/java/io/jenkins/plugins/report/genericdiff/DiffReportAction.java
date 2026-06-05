@@ -45,27 +45,40 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
 import hudson.model.Action;
+import hudson.model.Job;
+import hudson.model.Run;
+import hudson.tasks.Publisher;
 import jenkins.tasks.SimpleBuildStep;
 
 public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
 
-    private final AbstractBuild<?, ?> build;
+    private final Run<?, ?> run;
 
-    public DiffReportAction(AbstractBuild<?, ?> build) {
-        this.build = build;
+    public DiffReportAction(Run<?, ?> run) {
+        this.run = run;
     }
 
-    private RpmsReportPublisher getRpmsReport(AbstractBuild<?, ?> build) {
-        final RpmsReportPublisher data;
-        Optional<RpmsReportPublisher> publisher =
-                (build.getProject().getPublishersList().stream().filter(p -> p instanceof RpmsReportPublisher).map(a -> (RpmsReportPublisher) a).findFirst());
-        if (publisher.isPresent()) {
-            data = publisher.get();
+    private RpmsReportPublisher getRpmsReport(Run<?, ?> run) {
+        Job<?, ?> job = run.getParent();
+        if (job instanceof AbstractProject) {
+            AbstractProject<?, ?> project = (AbstractProject<?, ?>) job;
+            Optional<RpmsReportPublisher> publisher =
+                    (project.getPublishersList().stream().filter(p -> p instanceof RpmsReportPublisher).map(a -> (RpmsReportPublisher) a).findFirst());
+            if (publisher.isPresent()) {
+                return publisher.get();
+            } else {
+                return null;
+            }
         } else {
-            data = null;
+            List<RpmsReportAction> l =run.getActions(RpmsReportAction.class);
+            for(RpmsReportAction a : l) {
+                Publisher p = a.getPublisher();
+                return (RpmsReportPublisher) p;
+                }
         }
-        return data;
+        return null;
     }
 
     public String getDisplayName() {
@@ -121,8 +134,8 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
             res.setStatus(404);
             out.print("from and to have to be positive");
         } else {
-            AbstractBuild<?, ?> bFrom = this.build.getProject().getBuild(from + "");
-            AbstractBuild<?, ?> bTo = this.build.getProject().getBuild(to + "");
+            Run<?, ?> bFrom = this.run.getParent().getBuild(from + "");
+            Run<?, ?> bTo = this.run.getParent().getBuild(to + "");
             RpmsReportPublisher pFrom = getRpmsReport(bFrom);
             RpmsReportPublisher pTo = getRpmsReport(bTo);
             if (pFrom == null && pTo == null) {
@@ -227,31 +240,31 @@ public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
     }
 
     public String getThisBuild() {
-        if (build == null) {
+        if (run == null) {
             return "0";
         } else {
-            return build.getId();
+            return run.getId();
         }
     }
 
     public String getPreviousBuild() {
-        if (build == null) {
+        if (run == null) {
             return "0";
         } else {
-            AbstractBuild<?, ?> previouSbuild = build.getPreviousNotFailedBuild();
-            if (previouSbuild == null) {
+            Run<?, ?> previousRun = run.getPreviousNotFailedBuild();
+            if (previousRun == null) {
                 return "0";
             } else {
-                return previouSbuild.getId();
+                return previousRun.getId();
             }
         }
     }
 
     public List<String> getDiffIds() {
-        if (build == null) {
+        if (run == null) {
             return Arrays.asList(".*");
         }
-        RpmsReportPublisher pFrom = getRpmsReport(build);
+        RpmsReportPublisher pFrom = getRpmsReport(run);
         if (pFrom == null) {
             return Arrays.asList(".*");
         }

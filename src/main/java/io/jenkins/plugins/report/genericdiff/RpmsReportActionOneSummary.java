@@ -23,7 +23,7 @@
  */
 package io.jenkins.plugins.report.genericdiff;
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 
 import java.io.File;
@@ -43,11 +43,11 @@ public class RpmsReportActionOneSummary {
     private final List<String> allRpms;
 
     private final RpmsReportOneRecord publisher;
-    private final AbstractBuild<?, ?> build;
+    private final Run<?, ?> run;
 
-    public RpmsReportActionOneSummary(AbstractBuild<?, ?> build, RpmsReportOneRecord publisher) {
+    public RpmsReportActionOneSummary(Run<?, ?> run, RpmsReportOneRecord publisher) {
         this.publisher = publisher;
-        this.build = build;
+        this.run = run;
         newRpms = readFile(Constants.getNEW(getID()));
         removedRpms = readFile(Constants.getREMOVED(getID()));
         allRpms = readFile(Constants.getALL(getID()));
@@ -90,7 +90,7 @@ public class RpmsReportActionOneSummary {
      * Reads cached item
      */
     private List<String> readFile(String fileName) {
-        File file = new File(build.getRootDir(), fileName);
+        File file = new File(run.getRootDir(), fileName);
         if (file.exists() && file.isFile() && file.canRead()) {
             try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
                 return stream.collect(Collectors.toList());

@@ -24,7 +24,7 @@
 package io.jenkins.plugins.report.genericdiff;
 
 
-import hudson.model.AbstractBuild;
+import hudson.model.Run;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,15 +34,15 @@ public class RpmsReport {
     private final RpmsReportPublisher publisher;
     private final List<RpmsReportActionOneSummary> summary;
     private final List<RpmsReportSingle> index;
-    private final AbstractBuild<?, ?> build;
+    private final Run<?, ?> run;
 
-    public RpmsReport(RpmsReportPublisher publisher, AbstractBuild<?, ?> build) {
+    public RpmsReport(RpmsReportPublisher publisher, Run<?, ?> run) {
         this.publisher = publisher;
-        this.build = build;
+        this.run = run;
         summary = new ArrayList<>();
         index = new ArrayList<>();
         for(RpmsReportOneRecord record: this.publisher.getConfigurations()) {
-            RpmsReportActionOneSummary summary1 = new RpmsReportActionOneSummary(build, record);
+            RpmsReportActionOneSummary summary1 = new RpmsReportActionOneSummary(run, record);
             RpmsReportSingle index1 = new RpmsReportSingle(record, summary1.getStderr(), summary1.getNewRpms(), summary1.getRemovedRpms(), summary1.getAllRpms());
             summary.add(summary1);
             index.add(index1);
@@ -62,11 +62,11 @@ public class RpmsReport {
     }
 
     public String getRun() {
-        return build.getId();
+        return run.getId();
     }
 
     public int getBuildNumber() {
-        return build.getNumber();
+        return run.getNumber();
     }
 
     public String getPreviousLink() {
