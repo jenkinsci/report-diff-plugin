@@ -50,14 +50,35 @@ import hudson.model.Action;
 import hudson.model.Job;
 import hudson.model.Run;
 import hudson.tasks.Publisher;
+import jenkins.model.RunAction2;
 import jenkins.tasks.SimpleBuildStep;
 
-public class DiffReportAction implements SimpleBuildStep.LastBuildAction {
+public class DiffReportAction implements SimpleBuildStep.LastBuildAction, RunAction2 {
 
-    private final Run<?, ?> run;
+    private Run<?, ?> run;
+    /**
+     * Field name used before pipeline support (up to report-diff 4.6). Kept only so XStream can still
+     * read old build.xml files ({@code <build class="build" reference="../../.."/>}); its value is
+     * migrated to {@link #run} and it is never written again.
+     */
+    @Deprecated
+    private AbstractBuild<?, ?> build;
 
     public DiffReportAction(Run<?, ?> run) {
         this.run = run;
+    }
+
+    @Override
+    public void onAttached(Run<?, ?> r) {
+        this.run = r;
+    }
+
+    @Override
+    public void onLoad(Run<?, ?> r) {
+        // builds stored by older versions have the run in the legacy "build" field (or nowhere);
+        // Jenkins always tells us which run we belong to, so trust it
+        this.run = r != null ? r : build;
+        this.build = null;
     }
 
     private RpmsReportPublisher getRpmsReport(Run<?, ?> run) {
