@@ -32,16 +32,28 @@ import hudson.model.Run;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import hudson.tasks.Publisher;
 import hudson.util.DescribableList;
+import jenkins.model.RunAction2;
 import jenkins.tasks.SimpleBuildStep;
 import org.kohsuke.stapler.StaplerProxy;
 
 
-public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction {
+public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.LastBuildAction, RunAction2 {
 
-    private final Run<?, ?> run;
+    private static final Logger LOG = Logger.getLogger(RpmsReportAction.class.getName());
+
+    private Run<?, ?> run;
+    /**
+     * Field name used before pipeline support (up to report-diff 4.6). Kept only so XStream can still
+     * read old build.xml files ({@code <build class="build" reference="../../.."/>}); its value is
+     * migrated to {@link #run} and it is never written again.
+     */
+    @Deprecated
+    private AbstractBuild<?, ?> build;
     private transient RpmsReportPublisher publisher;
 
     public RpmsReportAction(Run<?, ?> run) {
@@ -51,6 +63,19 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
     public RpmsReportAction(Run<?, ?> run, RpmsReportPublisher publisher) {
         this.run = run;
         this.publisher = publisher;
+    }
+
+    @Override
+    public void onAttached(Run<?, ?> r) {
+        this.run = r;
+    }
+
+    @Override
+    public void onLoad(Run<?, ?> r) {
+        // builds stored by older versions have the run in the legacy "build" field (or nowhere);
+        // Jenkins always tells us which run we belong to, so trust it
+        this.run = r != null ? r : build;
+        this.build = null;
     }
 
     public RpmsReportPublisher getPublisher() {
@@ -110,8 +135,20 @@ public class RpmsReportAction implements Action, StaplerProxy, SimpleBuildStep.L
 
     @Override
     public Collection<? extends Action> getProjectActions() {
-        Job<?, ?> job = run.getParent();
-        return Collections.singleton(new RpmsReportProjectAction(job));
+        // Jenkins core collects project actions of all LastBuildActions of the last successful build
+        // in one loop (SimpleBuildStep.LastBuildActionFactory). Any exception thrown here would drop
+        // project actions (and thus charts) of all other plugins too, so never let it escape.
+        try {
+            if (run == null) {
+                LOG.log(Level.WARNING, "RpmsReportAction has no run attached, no project action created");
+                return Collections.emptyList();
+            }
+            Job<?, ?> job = run.getParent();
+            return Collections.singleton(new RpmsReportProjectAction(job));
+        } catch (RuntimeException | LinkageError ex) {
+            LOG.log(Level.WARNING, "Failed to create rpms project action for " + run, ex);
+            return Collections.emptyList();
+        }
     }
 
 }
